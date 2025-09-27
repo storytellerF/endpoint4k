@@ -8,21 +8,24 @@ This document captures project-specific knowledge to speed up builds, testing, a
   - `ktor:client`: Ktor HTTP client-side helpers. Requires Kotlin context receivers.
   - `ktor:server`: Ktor server-side route helpers.
   - `ktor`: Test-only module integrating both client and server for end-to-end style tests.
+  - `okhttp:client`: OkHttp-based HTTP client-side helpers mirroring the Ktor client APIs. Requires Kotlin context receivers.
+  - `okhttp`: Test-only module for OkHttp helpers, using MockWebServer to simulate a server.
 - Source sets:
   - Production: `src/main/kotlin`
   - Tests: `src/test/kotlin` and test resources in `src/test/resources` (e.g., `ktor/src/test/resources/logback.xml`).
 
 ## Toolchain and Build
-- Kotlin: 2.1.21 in all modules (server test module additionally applies `kotlinx-serialization` plugin 2.2.0).
+- Kotlin: 2.1.21 in all modules. Test-only modules that need JSON serialization features apply the `kotlinx-serialization` plugin 2.2.0 (`ktor` and `okhttp`).
 - JDK: Toolchain set to Java 21 in all modules:
   - `kotlin { jvmToolchain(21) }`
 - Build system: Gradle Kotlin DSL with Gradle Wrapper checked in.
 - JUnit Platform is enabled in all test tasks: `tasks.test { useJUnitPlatform() }`.
 - Compiler flags:
-  - Context receivers are used in `ktor:client` and enabled via `freeCompilerArgs.add("-Xcontext-parameters")`.
+  - Context receivers are used in `ktor:client`, `okhttp:client`, and tests that call those helpers; enabled via `freeCompilerArgs.add("-Xcontext-parameters")` in those modules.
 - Serialization:
   - Ktor 3.1.3 artifacts are used in Ktor modules.
-  - kotlinx-serialization-json 1.9.0.
+  - OkHttp 4.12.0 is used in OkHttp client and tests.
+  - kotlinx-serialization-json 1.9.0 across modules.
 
 ### Commands (Windows PowerShell/CMD)
 - Build all:
@@ -34,33 +37,40 @@ This document captures project-specific knowledge to speed up builds, testing, a
   - Ktor client: `./gradlew.bat :ktor:client:test`
   - Ktor server: `./gradlew.bat :ktor:server:test`
   - Ktor tests module: `./gradlew.bat :ktor:test`
+  - OkHttp client: `./gradlew.bat :okhttp:client:test`
+  - OkHttp tests module: `./gradlew.bat :okhttp:test`
 - Run a specific test class or method (use JUnit Platform `--tests` filter):
-  - Class: `./gradlew.bat :ktor:test --tests "KtorRouteTest"`
-  - Single method: `./gradlew.bat :ktor:test --tests "KtorRouteTest.test get route"`
+  - Ktor class: `./gradlew.bat :ktor:test --tests "KtorRouteTest"`
+  - OkHttp class: `./gradlew.bat :okhttp:test --tests "OkHttpRouteTest"`
+  - Single method (example): `./gradlew.bat :ktor:test --tests "KtorRouteTest.test get route"`
 
 Notes:
 - On Unix shells, replace `gradlew.bat` with `./gradlew`.
 - Running tests in IDE (IntelliJ IDEA) works out of the box. Ensure Project SDK is set to JDK 21.
 
 ## Testing Guidance
-- The `ktor` module contains comprehensive integration-style tests. See `ktor/src/test/kotlin/KtorRouteTest.kt` for patterns:
-  - Uses `io.ktor.server.testing.testApplication { ... }` to spin up an in-memory Ktor server.
-  - Client calls are made via the helpers in `ktor:client` using context receivers (import `com.storyteller_f.route4k.ktor.client.invoke as invoke2` for disambiguation in tests).
-  - Content negotiation is set up via `kotlinx.serialization` (JSON) for both client and server in tests.
-- Logging in tests: `ktor/src/test/resources/logback.xml` configures Logback for test runs.
+- Ktor path:
+  - The `ktor` module contains comprehensive integration-style tests. See `ktor/src/test/kotlin/KtorRouteTest.kt` for patterns:
+    - Uses `io.ktor.server.testing.testApplication { ... }` to spin up an in-memory Ktor server.
+    - Client calls are made via the helpers in `ktor:client` using context receivers (import `com.storyteller_f.route4k.ktor.client.invoke as invoke2` for disambiguation in tests).
+    - Content negotiation is set up via `kotlinx.serialization` (JSON) for both client and server in tests.
+  - Logging in tests: `ktor/src/test/resources/logback.xml` configures Logback for test runs.
+- OkHttp path:
+  - The `okhttp` module hosts integration-style tests for the OkHttp client. See `okhttp/src/test/kotlin/OkHttpRouteTest.kt`:
+    - Uses `MockWebServer` with a custom `Dispatcher` to simulate endpoints for GET/POST/DELETE and path/query variants.
+    - Client calls are made via the helpers in `okhttp:client` using context receivers: `context(OkHttpClient) { api.invoke(...) }`.
+    - JSON encoding/decoding is done via kotlinx-serialization in the OkHttp helpers; request bodies are encoded to `application/json` automatically for mutation APIs.
 
 ### Adding a New Test
-1. Pick the module whose behavior you’re verifying. For end-to-end route testing, prefer the `ktor` module.
+1. Pick the module whose behavior you’re verifying.
+   - For end-to-end route testing with Ktor, prefer the `ktor` module.
+   - For OkHttp client behavior against a simulated server, add tests under `okhttp` using MockWebServer.
 2. Create a test under `src/test/kotlin`. Example minimal test:
    
    ```kotlin
-   import kotlin.test.Test
-   import kotlin.test.assertTrue
-   
    class SimpleGuidelinesTest {
-       @Test
-       fun `smoke test`() {
-           assertTrue(true)
+       fun smokeTest() {
+           kotlin.test.assertTrue(true)
        }
    }
    ```
@@ -70,19 +80,40 @@ Notes:
    - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
    - Use server-side helpers from `ktor:server` (`invoke`, `receiveBody`).
    - Use client-side helpers from `ktor:client` (context receiver `HttpClient`), and set content type or body as needed.
+5. For OkHttp route tests, mirror the structure in `OkHttpRouteTest.kt`:
+   - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+   - Use `MockWebServer` to provide endpoints; build URLs from `server.url("/path")`.
+   - Use client-side helpers from `okhttp:client` (context receiver `OkHttpClient`). Optional headers can be added in the request builder lambda parameter.
 
 ## Development Notes
-- Context receivers: Several client/server APIs are designed with context receivers to keep call sites concise. This requires the `-Xcontext-parameters` compiler flag (already configured in `ktor:client` and `ktor` modules). If you add new modules that use context receivers, remember to add the same flag in their `kotlin { compilerOptions { ... } }` block.
+- Context receivers: Client/server APIs use context receivers to keep call sites concise. Ensure `-Xcontext-parameters` is set in modules that define or call these helpers (`ktor:client`, `okhttp:client`, and test modules that use them).
 - Version alignment:
   - Ktor artifacts are pinned to `3.1.3`. Keep client/server/test dependencies aligned to avoid runtime mismatches.
-  - Kotlinx Serialization JSON is `1.9.0` and must match the Kotlin/serialization plugin sufficiently; update versions in tandem.
-- Publishing: `common` and `ktor:client` apply a custom `common-publish` plugin (`common-publish/src/main/kotlin/common-publish.gradle.kts`). There’s also a `jitpack-publish.sh` helper script. If publishing or changing coordinates, review those scripts and plugin logic.
-- API URL composition: Path parameters are encoded via `encodeQueryParams` and substituted into templates like `/user/{id}`. Ensure any new placeholders match the data class property names of the `path` parameter.
-- Query encoding: Query classes are encoded into multi-valued parameters. When adding new types, ensure they are serializable or encodable by `CustomParameterEncoder` on the client side.
-- JSON payloads: For mutation APIs, set the request body with `setBody(body)` and specify content type when necessary (`ContentType.Application.Json`).
+  - OkHttp is pinned to `4.12.0`.
+  - Kotlinx Serialization JSON is `1.9.0` and should align with the Kotlin/serialization plugin; update versions in tandem.
+- Publishing: `common`, `ktor:client`, and `okhttp:client` apply a custom `common-publish` plugin (`common-publish/src/main/kotlin/common-publish.gradle.kts`). If publishing or changing coordinates, review those scripts and plugin logic.
+- API URL composition: Path parameters are encoded via an encoder and substituted into templates like `/user/{id}`. Ensure any new placeholders match the data class property names of the `path` parameter.
+- Query encoding: Query classes are encoded into multi-valued parameters. Both Ktor and OkHttp clients have compatible encoders (OkHttp client carries a local copy to avoid cross-module dependencies).
+- JSON payloads:
+  - Ktor: For mutation APIs, set the request body with `setBody(body)` and specify content type when necessary (`ContentType.Application.Json`).
+  - OkHttp: Mutation helpers serialize the body to JSON and set `application/json` automatically; you can still add headers via the provided `Request.Builder` lambda.
 
 ## Verified Steps This Session
-- Executed the full `ktor` test suite: all 8 tests passed.
-- Added a temporary smoke test under `ktor/src/test/kotlin`, executed it successfully, and removed it afterward to keep the repo clean.
+- Executed the full `ktor` test suite: all tests passed.
+- Executed the `okhttp` test suite with MockWebServer: all tests passed.
 
-If anything becomes outdated (Kotlin, Ktor, or serialization versions), update the version in the affected `build.gradle.kts` files and re-run `./gradlew.bat build` to validate.
+If anything becomes outdated (Kotlin, Ktor, OkHttp, or serialization versions), update the version in the affected `build.gradle.kts` files and re-run `./gradlew.bat build` to validate.
+
+
+## Implementation Placement Policy
+- All production (implementation) code must reside in submodules dedicated to client or server logic:
+  - Ktor client: ktor:client (src/main/kotlin)
+  - Ktor server: ktor:server (src/main/kotlin)
+  - OkHttp client: okhttp:client (src/main/kotlin)
+- Test-only modules:
+  - ktor and okhttp at the root of each stack are test harness modules only. They must not contain production sources. Use only src/test/kotlin (and src/test/resources) in these modules for integration/e2e tests.
+- Do not place feature implementations under the test modules’ src/main. Keep all new functionality in the appropriate client/server submodule and cover it with tests under the corresponding test module’s src/test.
+- When adding new helpers:
+  - Shared API definitions and types live in common.
+  - Client-specific calling helpers belong to the respective *:client* module.
+  - Server-side route wiring belongs to ktor:server only.
