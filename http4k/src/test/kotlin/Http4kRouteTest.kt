@@ -1,26 +1,21 @@
 import com.storyteller_f.route4k.common.MutationMethodType
 import com.storyteller_f.route4k.common.mutationApi
-import com.storyteller_f.route4k.common.mutationApiWithPath
-import com.storyteller_f.route4k.common.mutationApiWithQuery
 import com.storyteller_f.route4k.common.mutationApiWithQueryAndPath
 import com.storyteller_f.route4k.common.safeApi
-import com.storyteller_f.route4k.common.safeApiWithPath
 import com.storyteller_f.route4k.common.safeApiWithQuery
 import com.storyteller_f.route4k.common.safeApiWithQueryAndPath
-import com.storyteller_f.route4k.http4k.invoke as invoke3
-import com.storyteller_f.route4k.http4k.server.invoke as serverInvoke
 import com.storyteller_f.route4k.http4k.server.receiveBody
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.routing.routes
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import com.storyteller_f.route4k.http4k.invoke as invoke3
+import com.storyteller_f.route4k.http4k.server.invoke as serverInvoke
 
 class Http4kRouteTest {
 
@@ -133,7 +128,9 @@ class Http4kRouteTest {
     @Test
     fun `test mut with query and path`() = runBlocking {
         // server side
-        val addUserWithQP = mutationApiWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>("/user/{id}")
+        val addUserWithQP = mutationApiWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>(
+            "/user/{id}"
+        )
         val handler: HttpHandler = routes(
             addUserWithQP.serverInvoke(handleResult = { _, result ->
                 result.fold(

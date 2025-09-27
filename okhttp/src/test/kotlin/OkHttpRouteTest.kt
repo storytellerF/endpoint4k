@@ -1,18 +1,12 @@
 import com.storyteller_f.route4k.common.MutationMethodType
 import com.storyteller_f.route4k.common.mutationApi
-import com.storyteller_f.route4k.common.mutationApiWithPath
-import com.storyteller_f.route4k.common.mutationApiWithQuery
 import com.storyteller_f.route4k.common.mutationApiWithQueryAndPath
 import com.storyteller_f.route4k.common.safeApi
-import com.storyteller_f.route4k.common.safeApiWithPath
 import com.storyteller_f.route4k.common.safeApiWithQuery
 import com.storyteller_f.route4k.common.safeApiWithQueryAndPath
-import com.storyteller_f.route4k.okhttp.invoke as invoke2
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -22,6 +16,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import com.storyteller_f.route4k.okhttp.invoke as invoke2
 
 class OkHttpRouteTest {
     private lateinit var server: MockWebServer
@@ -73,7 +68,13 @@ class OkHttpRouteTest {
                     // POST /user with body -> echo body
                     request.method == "POST" && path == "/user" -> {
                         val bodyStr = request.body.readUtf8()
-                        val obj = if (bodyStr.isBlank()) CommonObject("") else Json.decodeFromString<CommonObject>(bodyStr)
+                        val obj = if (bodyStr.isBlank()) {
+                            CommonObject(
+                                ""
+                            )
+                        } else {
+                            Json.decodeFromString<CommonObject>(bodyStr)
+                        }
                         MockResponse().setResponseCode(200).setBody(Json.encodeToString(obj))
                     }
 
@@ -85,7 +86,13 @@ class OkHttpRouteTest {
                     request.method == "POST" && path.startsWith("/user/") && query != null -> {
                         val id = path.substringAfterLast('/')
                         val bodyStr = request.body.readUtf8()
-                        val obj = if (bodyStr.isBlank()) CommonObject("") else Json.decodeFromString<CommonObject>(bodyStr)
+                        val obj = if (bodyStr.isBlank()) {
+                            CommonObject(
+                                ""
+                            )
+                        } else {
+                            Json.decodeFromString<CommonObject>(bodyStr)
+                        }
                         MockResponse().setResponseCode(200)
                             .setBody(Json.encodeToString(CommonObject("$query ${obj.name} $id")))
                     }

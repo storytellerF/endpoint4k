@@ -5,6 +5,7 @@ okhttp = "4.12.0"
 kotlinxSerializationJson = "1.9.0"
 kotlinxCoroutines = "1.9.0"
 http4k = "5.30.0.0"
+detektVersion = "1.23.8"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -23,5 +24,10 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 http4k-core = { module = "org.http4k:http4k-core", version.ref = "http4k" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.13" }
 
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
+detekt-rules-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detektVersion" }
+detekt-rules-ruleauthors = { module = "io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors", version.ref = "detektVersion" }
+
 [plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 # Keeping plugin versions in build files to minimize changes; declare here if needed later.

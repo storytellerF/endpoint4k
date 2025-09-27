@@ -1,3 +1,5 @@
+@file:Suppress("detekt.formatting")
+
 package com.storyteller_f.route4k.http4k
 
 import com.storyteller_f.route4k.common.*
@@ -9,11 +11,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Uri
+import org.http4k.core.*
 import kotlin.reflect.KClass
 
 @PublishedApi
@@ -45,7 +43,7 @@ context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
     query: Q,
-    path: P
+    path: P,
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -71,7 +69,7 @@ context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
     body: B,
-    crossinline block: (Request) -> Request
+    crossinline block: (Request) -> Request,
 ): R {
     return with(route) {
         val request = buildMutationRequest(urlString, methodType, body, block)
@@ -84,7 +82,7 @@ context(route: HttpHandler)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
-    crossinline block: (Request) -> Request
+    crossinline block: (Request) -> Request,
 ): R {
     return with(route) {
         val finalUrl = appendQueryParameters(urlString, this@invoke, query)
@@ -99,7 +97,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
     query: Q,
     path: P,
     body: B,
-    crossinline block: (Request) -> Request
+    crossinline block: (Request) -> Request,
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -114,7 +112,7 @@ context(route: HttpHandler)
 suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
     path: P,
     body: B,
-    crossinline block: (Request) -> Request
+    crossinline block: (Request) -> Request,
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -173,7 +171,7 @@ internal inline fun <reified B : Any> buildMutationRequest(
     urlString: String,
     methodType: MutationMethodType,
     body: B,
-    crossinline block: (Request) -> Request
+    crossinline block: (Request) -> Request,
 ): Request {
     val (headers, bodyContent) = buildRequestBody(body)
     val method = methodType.toHttp4kMethod(body !is Unit)
@@ -226,7 +224,7 @@ internal fun <T : Any> encodeQueryParams(value: T, clazz: KClass<T>): Map<String
 @OptIn(InternalSerializationApi::class)
 internal class CustomParameterEncoder<T : Any>(
     clazz: KClass<T>,
-    serializer: KSerializer<T>
+    serializer: KSerializer<T>,
 ) : NamedValueEncoder() {
     val map = mutableMapOf<String, MutableList<String>>()
 
@@ -235,8 +233,18 @@ internal class CustomParameterEncoder<T : Any>(
     override fun encodeTaggedValue(tag: String, value: Any) {
         val newTag = tag.substringBeforeLast(".")
         when (value) {
-            is Iterable<*> -> value.forEach { item -> if (item != null) map.getOrPut(newTag) { mutableListOf() }.add(item.toString()) }
-            is Array<*> -> value.forEach { item -> if (item != null) map.getOrPut(newTag) { mutableListOf() }.add(item.toString()) }
+            is Iterable<*> -> value.forEach { item ->
+                if (item != null) map.getOrPut(
+                    newTag
+                ) { mutableListOf() }.add(item.toString())
+            }
+
+            is Array<*> -> value.forEach { item ->
+                if (item != null) map.getOrPut(
+                    newTag
+                ) { mutableListOf() }.add(item.toString())
+            }
+
             else -> map.getOrPut(newTag) { mutableListOf() }.add(value.toString())
         }
     }

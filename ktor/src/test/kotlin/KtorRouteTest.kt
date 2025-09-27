@@ -22,7 +22,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import com.storyteller_f.route4k.ktor.client.invoke as invoke2
 
-
 class KtorRouteTest {
     @Serializable
     data class CommonObject(val name: String)
@@ -310,7 +309,6 @@ suspend inline fun <reified R> RoutingContext.handleResult(it: Result<R>) {
 
 suspend fun RoutingContext.respondError(e: Throwable) {
     when (e) {
-
         is MissingRequestParameterException, is ParameterConversionException, is ContentTransformationException -> {
             call.respond(HttpStatusCode.BadRequest, e.localizedMessage)
         }
