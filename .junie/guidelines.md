@@ -10,6 +10,9 @@ This document captures project-specific knowledge to speed up builds, testing, a
   - `ktor`: Test-only module integrating both client and server for end-to-end style tests.
   - `okhttp:client`: OkHttp-based HTTP client-side helpers mirroring the Ktor client APIs. Requires Kotlin context receivers.
   - `okhttp`: Test-only module for OkHttp helpers, using MockWebServer to simulate a server.
+  - `http4k:client`: http4k HTTP client-side helpers mirroring the Ktor/OkHttp client APIs.
+  - `http4k:server`: http4k server-side route helpers.
+  - `http4k`: Test-only module for http4k helpers and routing, using in-process http4k server.
 - Source sets:
   - Production: `src/main/kotlin`
   - Tests: `src/test/kotlin` and test resources in `src/test/resources` (e.g., `ktor/src/test/resources/logback.xml`).
@@ -22,9 +25,10 @@ This document captures project-specific knowledge to speed up builds, testing, a
 - JUnit Platform is enabled in all test tasks: `tasks.test { useJUnitPlatform() }`.
 - Compiler flags:
   - Context receivers are used in `ktor:client`, `okhttp:client`, and tests that call those helpers; enabled via `freeCompilerArgs.add("-Xcontext-parameters")` in those modules.
-- Serialization:
+- Serialization / Dependencies:
   - Ktor 3.1.3 artifacts are used in Ktor modules.
   - OkHttp 4.12.0 is used in OkHttp client and tests.
+  - http4k 5.30.0.0 is used for http4k client/server and tests.
   - kotlinx-serialization-json 1.9.0 across modules.
 
 ### Commands (Windows PowerShell/CMD)
@@ -39,9 +43,13 @@ This document captures project-specific knowledge to speed up builds, testing, a
   - Ktor tests module: `./gradlew.bat :ktor:test`
   - OkHttp client: `./gradlew.bat :okhttp:client:test`
   - OkHttp tests module: `./gradlew.bat :okhttp:test`
+  - http4k client: `./gradlew.bat :http4k:client:test`
+  - http4k server: `./gradlew.bat :http4k:server:test`
+  - http4k tests module: `./gradlew.bat :http4k:test`
 - Run a specific test class or method (use JUnit Platform `--tests` filter):
   - Ktor class: `./gradlew.bat :ktor:test --tests "KtorRouteTest"`
   - OkHttp class: `./gradlew.bat :okhttp:test --tests "OkHttpRouteTest"`
+  - http4k class: `./gradlew.bat :http4k:test --tests "Http4kRouteTest"`
   - Single method (example): `./gradlew.bat :ktor:test --tests "KtorRouteTest.test get route"`
 
 Notes:
@@ -60,11 +68,17 @@ Notes:
     - Uses `MockWebServer` with a custom `Dispatcher` to simulate endpoints for GET/POST/DELETE and path/query variants.
     - Client calls are made via the helpers in `okhttp:client` using context receivers: `context(OkHttpClient) { api.invoke(...) }`.
     - JSON encoding/decoding is done via kotlinx-serialization in the OkHttp helpers; request bodies are encoded to `application/json` automatically for mutation APIs.
+- http4k path:
+  - The `http4k` module hosts integration-style tests for the http4k client/server. See `http4k/src/test/kotlin/Http4kRouteTest.kt`:
+    - Uses in-process http4k routing to simulate endpoints for GET/POST/DELETE and path/query variants.
+    - Client calls are made via the helpers in `http4k:client` without context receivers; helpers build http4k Requests and decode Responses.
+    - JSON encoding/decoding is done via kotlinx-serialization in the http4k helpers; request bodies are encoded to `application/json` automatically for mutation APIs.
 
 ### Adding a New Test
 1. Pick the module whose behavior you’re verifying.
    - For end-to-end route testing with Ktor, prefer the `ktor` module.
    - For OkHttp client behavior against a simulated server, add tests under `okhttp` using MockWebServer.
+   - For in-process client/server tests with http4k, add tests under the `http4k` module.
 2. Create a test under `src/test/kotlin`. Example minimal test:
    
    ```kotlin
@@ -81,9 +95,13 @@ Notes:
    - Use server-side helpers from `ktor:server` (`invoke`, `receiveBody`).
    - Use client-side helpers from `ktor:client` (context receiver `HttpClient`), and set content type or body as needed.
 5. For OkHttp route tests, mirror the structure in `OkHttpRouteTest.kt`:
-   - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
-   - Use `MockWebServer` to provide endpoints; build URLs from `server.url("/path")`.
-   - Use client-side helpers from `okhttp:client` (context receiver `OkHttpClient`). Optional headers can be added in the request builder lambda parameter.
+  - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+  - Use `MockWebServer` to provide endpoints; build URLs from `server.url("/path")`.
+  - Use client-side helpers from `okhttp:client` (context receiver `OkHttpClient`). Optional headers can be added in the request builder lambda parameter.
+6. For http4k route tests, mirror the structure in `Http4kRouteTest.kt`:
+  - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+  - Use in-process http4k routing via the server helpers in `http4k:server` (`invoke`, `receiveBody`).
+  - Use client-side helpers from `http4k:client` (no context receiver). Optional headers can be set on the http4k Request in the builder lambda.
 
 ## Development Notes
 - Context receivers: Client/server APIs use context receivers to keep call sites concise. Ensure `-Xcontext-parameters` is set in modules that define or call these helpers (`ktor:client`, `okhttp:client`, and test modules that use them).
@@ -98,11 +116,10 @@ Notes:
   - Ktor: For mutation APIs, set the request body with `setBody(body)` and specify content type when necessary (`ContentType.Application.Json`).
   - OkHttp: Mutation helpers serialize the body to JSON and set `application/json` automatically; you can still add headers via the provided `Request.Builder` lambda.
 
-## Verified Steps This Session
-- Executed the full `ktor` test suite: all tests passed.
-- Executed the `okhttp` test suite with MockWebServer: all tests passed.
+## Verification Notes
+This guideline doesn’t assert live test results. Use the Commands section to run the relevant module or full test suites locally/CI.
 
-If anything becomes outdated (Kotlin, Ktor, OkHttp, or serialization versions), update the version in the affected `build.gradle.kts` files and re-run `./gradlew.bat build` to validate.
+If anything becomes outdated (Kotlin, Ktor, OkHttp, http4k, or serialization versions), update the version in the affected `build.gradle.kts` files and re-run `./gradlew.bat build` to validate.
 
 
 ## Implementation Placement Policy
@@ -110,10 +127,12 @@ If anything becomes outdated (Kotlin, Ktor, OkHttp, or serialization versions), 
   - Ktor client: ktor:client (src/main/kotlin)
   - Ktor server: ktor:server (src/main/kotlin)
   - OkHttp client: okhttp:client (src/main/kotlin)
+  - http4k client: http4k:client (src/main/kotlin)
+  - http4k server: http4k:server (src/main/kotlin)
 - Test-only modules:
-  - ktor and okhttp at the root of each stack are test harness modules only. They must not contain production sources. Use only src/test/kotlin (and src/test/resources) in these modules for integration/e2e tests.
+  - ktor, okhttp, and http4k at the root of each stack are test harness modules only. They must not contain production sources. Use only src/test/kotlin (and src/test/resources) in these modules for integration/e2e tests.
 - Do not place feature implementations under the test modules’ src/main. Keep all new functionality in the appropriate client/server submodule and cover it with tests under the corresponding test module’s src/test.
 - When adding new helpers:
   - Shared API definitions and types live in common.
   - Client-specific calling helpers belong to the respective *:client* module.
-  - Server-side route wiring belongs to ktor:server only.
+  - Server-side route wiring belongs to ktor:server and http4k:server only.
