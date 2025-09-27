@@ -179,12 +179,14 @@ private inline fun <R : Any> handleRequest(
 }
 
 fun handleCaughtException(e: Exception): Response {
-    // http4k core has no built-in logging here; users can wrap in Filters if needed.
+    e.printStackTrace()
     return Response(Status.INTERNAL_SERVER_ERROR).body("Catch exception")
 }
 
 @OptIn(InternalSerializationApi::class)
-suspend inline fun <reified Resp, reified Body : Any> AbstractMutationApi<Resp, Body>.receiveBody(request: Request): Body {
+inline fun <reified Resp, reified Body : Any> AbstractMutationApi<Resp, Body>.receiveBody(
+    request: Request
+): Body {
     val bodyString = request.bodyString()
     @Suppress("UNCHECKED_CAST")
     return when (Body::class) {

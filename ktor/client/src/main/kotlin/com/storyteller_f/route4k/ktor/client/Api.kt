@@ -1,3 +1,5 @@
+@file:Suppress("detekt.formatting")
+
 package com.storyteller_f.route4k.ktor.client
 
 import com.storyteller_f.route4k.common.*
@@ -86,16 +88,15 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> Mutation
     }
 }
 
-
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-        MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
-    query: Q,
-    path: P,
-    body: B,
-    crossinline block: HttpRequestBuilder.() -> Unit
-): R {
+    MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+        query: Q,
+        path: P,
+        body: B,
+        crossinline block: HttpRequestBuilder.() -> Unit
+    ): R {
     val newUrlString = getUrlString(path, pathClass, urlString)
     return with(route) {
         customMutationRequest(newUrlString) {

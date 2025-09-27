@@ -1,3 +1,5 @@
+@file:Suppress("detekt.formatting")
+
 package com.storyteller_f.route4k.ktor.server
 
 import com.storyteller_f.route4k.common.*
@@ -125,7 +127,8 @@ operator fun <R : Any, B : Any> MutationApi<R, B>.invoke(
 context(api: AbstractMutationApi<Resp, Body>)
 fun <Resp, Body> Route.customMutationBind(body: RoutingHandler) {
     route(
-        api.urlString, when (api.methodType) {
+        api.urlString,
+        when (api.methodType) {
             MutationMethodType.PUT -> HttpMethod.Put
             MutationMethodType.POST -> HttpMethod.Post
             MutationMethodType.DELETE -> HttpMethod.Delete
@@ -163,7 +166,6 @@ private fun <Q : Any> RoutingContext.getQuery(kClass: KClass<Q>): Q {
         )
     )
 }
-
 
 @OptIn(InternalSerializationApi::class)
 private fun <P : Any> RoutingContext.getPathQuery(kClass: KClass<P>): P {

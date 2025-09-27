@@ -1,6 +1,10 @@
+@file:Suppress("detekt.formatting")
+
 package com.storyteller_f.route4k.okhttp
 
 import com.storyteller_f.route4k.common.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -9,8 +13,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -121,12 +123,12 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> Mutation
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-        MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
-    query: Q,
-    path: P,
-    body: B,
-    crossinline block: Request.Builder.() -> Unit
-): R {
+    MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+        query: Q,
+        path: P,
+        body: B,
+        crossinline block: Request.Builder.() -> Unit
+    ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
         val finalUrl = appendQueryParametersOkHttp(newUrlString, this@invoke, query)
@@ -171,7 +173,9 @@ internal suspend inline fun <reified R : Any> OkHttpClient.requestAndDecode(requ
     return withContext(Dispatchers.IO) {
         val response: Response = newCall(request).execute()
         response.use {
-            if (!it.isSuccessful) throw IllegalStateException("HTTP ${'$'}{it.code}: ${'$'}{it.message}")
+            check(it.isSuccessful) {
+                "HTTP ${'$'}{it.code}: ${'$'}{it.message}"
+            }
             val body = it.body?.string() ?: ""
             @Suppress("UNCHECKED_CAST")
             when (R::class) {
@@ -209,9 +213,7 @@ internal inline fun <reified B : Any> buildMutationRequest(
         .url(urlString)
         .apply(block)
 
-    val method = methodType.toOkHttpMethod(hasBody)
-
-    return when (method) {
+    return when (val method = methodType.toOkHttpMethod(hasBody)) {
         "POST" -> builder.post(requestBody ?: "".toRequestBody(null)).build()
         "PUT" -> builder.put(requestBody ?: "".toRequestBody(null)).build()
         "PATCH" -> builder.patch(requestBody ?: "".toRequestBody(null)).build()
@@ -246,7 +248,7 @@ internal fun <P : Any> buildPathUrlString(path: P, pathClass: KClass<P>, urlStri
     }
 }
 
-// Local copy of query encoder to avoid depending on :ktor:client
+// Local copy of a query encoder to avoid depending on :ktor:client
 @OptIn(InternalSerializationApi::class)
 internal fun <T : Any> encodeQueryParams(value: T, clazz: KClass<T>): Map<String, List<String>> {
     val serializer = clazz.serializer()
