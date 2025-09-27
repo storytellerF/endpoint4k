@@ -29,7 +29,7 @@ operator fun <R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke
             block(req, q, p)
         }
     }
-    return routes(urlString bind Method.GET to handler)
+    return routes(urlString bind methodType.toHttp4kMethod() to handler)
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -57,7 +57,7 @@ operator fun <R : Any, P : Any> SafeApiWithPath<R, P>.invoke(
             block(req, p)
         }
     }
-    return routes(urlString bind Method.GET to handler)
+    return routes(urlString bind methodType.toHttp4kMethod() to handler)
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -66,7 +66,7 @@ operator fun <R : Any> SafeApi<R>.invoke(
     block: (req: Request) -> Result<R?>?
 ): RoutingHttpHandler {
     val handler: HttpHandler = { req -> handleRequest(req, handleResult) { block(req) } }
-    return routes(urlString bind Method.GET to handler)
+    return routes(urlString bind methodType.toHttp4kMethod() to handler)
 }
 
 // -------------------- Mutation APIs --------------------
