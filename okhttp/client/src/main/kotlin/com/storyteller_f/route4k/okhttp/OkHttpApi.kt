@@ -9,6 +9,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -165,18 +167,20 @@ internal fun MutationMethodType.toOkHttpMethod(hasBody: Boolean): String = when 
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal inline fun <reified R : Any> OkHttpClient.requestAndDecode(request: Request): R {
-    val response: Response = newCall(request).execute()
-    response.use {
-        if (!it.isSuccessful) throw IllegalStateException("HTTP ${'$'}{it.code}: ${'$'}{it.message}")
-        val body = it.body?.string() ?: ""
-        @Suppress("UNCHECKED_CAST")
-        return when (R::class) {
-            String::class -> body as R
-            Unit::class -> Unit as R
-            else -> {
-                val deserializer = R::class.serializer()
-                JsonCodec.decodeFromString(deserializer, body)
+internal suspend inline fun <reified R : Any> OkHttpClient.requestAndDecode(request: Request): R {
+    return withContext(Dispatchers.IO) {
+        val response: Response = newCall(request).execute()
+        response.use {
+            if (!it.isSuccessful) throw IllegalStateException("HTTP ${'$'}{it.code}: ${'$'}{it.message}")
+            val body = it.body?.string() ?: ""
+            @Suppress("UNCHECKED_CAST")
+            when (R::class) {
+                String::class -> body as R
+                Unit::class -> Unit as R
+                else -> {
+                    val deserializer = R::class.serializer()
+                    JsonCodec.decodeFromString(deserializer, body)
+                }
             }
         }
     }

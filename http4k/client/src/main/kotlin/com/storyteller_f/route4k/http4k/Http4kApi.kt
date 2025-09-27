@@ -11,6 +11,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.http4k.core.*
 import kotlin.reflect.KClass
 
@@ -137,21 +139,23 @@ internal fun MutationMethodType.toHttp4kMethod(hasBody: Boolean): Method = when 
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal inline fun <reified R : Any> HttpHandler.requestAndDecode(request: Request): R {
-    val response: Response = this(request)
-    if (response.status.successful) {
-        val body = response.bodyString()
-        @Suppress("UNCHECKED_CAST")
-        return when (R::class) {
-            String::class -> body as R
-            Unit::class -> Unit as R
-            else -> {
-                val deserializer = R::class.serializer()
-                JsonCodec.decodeFromString(deserializer, body)
+internal suspend inline fun <reified R : Any> HttpHandler.requestAndDecode(request: Request): R {
+    return withContext(Dispatchers.IO) {
+        val response: Response = this@requestAndDecode(request)
+        if (response.status.successful) {
+            val body = response.bodyString()
+            @Suppress("UNCHECKED_CAST")
+            when (R::class) {
+                String::class -> body as R
+                Unit::class -> Unit as R
+                else -> {
+                    val deserializer = R::class.serializer()
+                    JsonCodec.decodeFromString(deserializer, body)
+                }
             }
+        } else {
+            error("HTTP error ${'$'}{response.status.code}: ${'$'}{response.bodyString()}")
         }
-    } else {
-        error("HTTP error ${'$'}{response.status.code}: ${'$'}{response.bodyString()}")
     }
 }
 
