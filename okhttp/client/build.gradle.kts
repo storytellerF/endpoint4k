@@ -1,0 +1,22 @@
+plugins {
+    kotlin("jvm") version "2.1.21"
+    id("common-publish")
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(21)
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
+    }
+}
