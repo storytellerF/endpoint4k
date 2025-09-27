@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
-    implementation("io.ktor:ktor-server-core-jvm:3.1.3")
+    implementation(libs.ktor.server.core)
     testImplementation(kotlin("test"))
 }
 

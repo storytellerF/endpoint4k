@@ -8,15 +8,15 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     testImplementation(project(":common"))
-    testImplementation("io.ktor:ktor-server-test-host:3.1.3")
+    testImplementation(libs.ktor.server.test.host)
     testImplementation(project(":ktor:client"))
     testImplementation(project(":ktor:server"))
     testImplementation(kotlin("test"))
-    testImplementation("io.ktor:ktor-server-content-negotiation:3.1.3")
-    testImplementation("io.ktor:ktor-client-content-negotiation:3.1.3")
-    testImplementation("io.ktor:ktor-serialization-kotlinx-json:3.1.3")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    testImplementation("ch.qos.logback:logback-classic:1.5.13")
+    testImplementation(libs.ktor.server.content.negotiation)
+    testImplementation(libs.ktor.client.content.negotiation)
+    testImplementation(libs.ktor.serialization.kotlinx.json)
+    testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.logback.classic)
 }
 
 tasks.test {

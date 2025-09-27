@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
-    implementation("io.ktor:ktor-client-core:3.1.3")
+    implementation(libs.ktor.client.core)
     testImplementation(kotlin("test"))
 }
 

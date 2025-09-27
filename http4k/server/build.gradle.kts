@@ -4,8 +4,8 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
-    implementation("org.http4k:http4k-core:5.30.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.http4k.core)
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(kotlin("test"))
 }
 
