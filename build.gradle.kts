@@ -30,7 +30,12 @@ subprojects {
         // Can lead to speedups in larger projects. `false` by default.
         parallel = true
 
+        // Auto-correct issues which can be fixed automatically. Remaining findings should fail the build.
         autoCorrect = true
+        ignoreFailures = false
+
+        // Use the shared detekt configuration
+        config.setFrom(rootProject.files("config/detekt/detekt.yml"))
 
         // Android: Don't create tasks for the specified build types (e.g. "release")
         ignoredBuildTypes = listOf("release")
@@ -58,6 +63,11 @@ subprojects {
         }
         basePath = rootDir.absolutePath
         finalizedBy(detektReportMergeSarif)
+    }
+
+    // Ensure detekt runs as part of the standard build lifecycle when a 'check' task exists
+    tasks.matching { it.name == "check" }.configureEach {
+        dependsOn("detekt")
     }
 
     detektReportMergeSarif {

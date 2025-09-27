@@ -121,6 +121,18 @@ This guideline doesn’t assert live test results. Use the Commands section to r
 
 If anything becomes outdated (Kotlin, Ktor, OkHttp, http4k, or serialization versions), update the version in the affected `build.gradle.kts` files and re-run `./gradlew.bat build` to validate.
 
+## Static Analysis (Detekt)
+Detekt is enabled across all modules and runs as part of the Gradle build.
+
+- Run detekt on the whole project:
+  - `./gradlew.bat detekt`
+- Run detekt for a single module (example):
+  - `./gradlew.bat :ktor:client:detekt`
+- Auto-correction: The build is configured with `autoCorrect=true`. Detekt will automatically fix issues it can correct (mostly formatting via the formatting ruleset). These auto-correctable issues are ignored as failures; only remaining findings (non-auto-correctable) will fail the build.
+- Config file: Rules are configured via `config/detekt/detekt.yml` at the root. Adjust rule severities or disable rules there if needed for the project.
+- Reports: XML, HTML, TXT, SARIF, and MD reports are generated under each module’s `build/reports/detekt/`. A merged SARIF is also produced at `build/reports/detekt/merge.sarif` at the root for CI code scanning.
+- Fix remaining issues: If detekt reports non-auto-correctable findings, fix them manually in code and re-run `./gradlew.bat detekt` until clean.
+
 
 ## Implementation Placement Policy
 - All production (implementation) code must reside in submodules dedicated to client or server logic:
