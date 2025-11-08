@@ -150,7 +150,7 @@ private suspend fun <R : Any> RoutingContext.handleRequest(
         } else {
             handleResult(result)
         }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         handleCaughtException(e)
     }
 }
@@ -179,12 +179,12 @@ private fun <P : Any> RoutingContext.getPathQuery(kClass: KClass<P>): P {
     )
 }
 
-suspend fun RoutingContext.handleCaughtException(e: Exception) {
-    call.application.log.error("Catch exception in api", e)
+suspend fun RoutingContext.handleCaughtException(throwable: Throwable) {
+    call.application.log.error("Catch exception in api [${call.isHandled}]", throwable)
     if (!call.isHandled) {
         try {
             call.respond(HttpStatusCode.InternalServerError, "Catch exception")
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             call.application.log.error("Throw exception again when response internal server error", e)
         }
     }
