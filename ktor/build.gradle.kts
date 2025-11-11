@@ -3,7 +3,7 @@ plugins {
     kotlin("plugin.serialization") version "2.2.0"
 }
 
-group = "com.storyteller_f.route4k"
+group = "com.storyteller_f.endpoint4k"
 version = "1.0-SNAPSHOT"
 
 dependencies {

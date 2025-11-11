@@ -1,4 +1,4 @@
-package com.storyteller_f.route4k.common
+package com.storyteller_f.endpoint4k.common
 
 import kotlin.reflect.KClass
 

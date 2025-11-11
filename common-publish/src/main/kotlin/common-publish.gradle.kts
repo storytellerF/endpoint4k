@@ -2,7 +2,7 @@ plugins {
     `maven-publish`
 }
 
-group = property("group") ?: "com.storyteller_f.route4k"
+group = property("group") ?: "com.storyteller_f.endpoint4k"
 version = property("version") ?: "1.0-SNAPSHOT"
 
 publishing {

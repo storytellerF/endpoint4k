@@ -1,4 +1,4 @@
-package com.storyteller_f.route4k.http4k.server
+package com.storyteller_f.endpoint4k.http4k.server
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind

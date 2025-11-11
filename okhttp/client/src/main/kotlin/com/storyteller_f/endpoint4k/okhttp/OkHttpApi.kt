@@ -1,8 +1,8 @@
 @file:Suppress("detekt.formatting")
 
-package com.storyteller_f.route4k.http4k.client
+package com.storyteller_f.endpoint4k.okhttp
 
-import com.storyteller_f.route4k.common.*
+import com.storyteller_f.endpoint4k.common.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.InternalSerializationApi
@@ -13,66 +13,92 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
-import org.http4k.core.*
-import java.net.URLEncoder
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import kotlin.reflect.KClass
+
+/**
+ * OkHttp-based client implementation mirroring the Ktor client helpers.
+ *
+ * These helpers use kotlinx-serialization for JSON encoding/decoding.
+ * Use them with context receivers:
+ *
+ * context(okHttpClient) { api.invoke(...) }
+ */
 
 @PublishedApi
 internal val JsonCodec: Json = Json { ignoreUnknownKeys = true }
 
 // -------------------- Safe APIs --------------------
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 @Suppress("NOTHING_TO_INLINE")
 suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
     return with(route) {
-        val request = Request(methodType.toHttp4kMethod(), Uri.of(urlString))
+        val request = Request.Builder()
+            .url(urlString)
+            .method(methodType.toOkHttpMethod(), null)
+            .build()
         requestAndDecode<R>(request)
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(query: Q): R {
     return with(route) {
-        val finalUrl = appendQueryParameters(urlString, this@invoke, query)
-        val request = Request(methodType.toHttp4kMethod(), Uri.of(finalUrl))
+        val finalUrl = appendQueryParametersOkHttp(urlString, this@invoke, query)
+        val request = Request.Builder()
+            .url(finalUrl)
+            .method(methodType.toOkHttpMethod(), null)
+            .build()
         requestAndDecode<R>(request)
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
     query: Q,
-    path: P,
+    path: P
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
-        val finalUrl = appendQueryParameters(newUrlString, this@invoke, query)
-        val request = Request(methodType.toHttp4kMethod(), Uri.of(finalUrl))
+        val finalUrl = appendQueryParametersOkHttp(newUrlString, this@invoke, query)
+        val request = Request.Builder()
+            .url(finalUrl)
+            .method(methodType.toOkHttpMethod(), null)
+            .build()
         requestAndDecode<R>(request)
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.invoke(path: P): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
-        val request = Request(methodType.toHttp4kMethod(), Uri.of(newUrlString))
+        val request = Request.Builder()
+            .url(newUrlString)
+            .method(methodType.toOkHttpMethod(), null)
+            .build()
         requestAndDecode<R>(request)
     }
 }
 
 // -------------------- Mutation APIs --------------------
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
     body: B,
-    crossinline block: (Request) -> Request = { it },
+    crossinline block: Request.Builder.() -> Unit
 ): R {
     return with(route) {
         val request = buildMutationRequest(urlString, methodType, body, block)
@@ -80,43 +106,43 @@ suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
-    crossinline block: (Request) -> Request = { it },
+    crossinline block: Request.Builder.() -> Unit
 ): R {
     return with(route) {
-        val finalUrl = appendQueryParameters(urlString, this@invoke, query)
+        val finalUrl = appendQueryParametersOkHttp(urlString, this@invoke, query)
         val request = buildMutationRequest(finalUrl, methodType, body, block)
         requestAndDecode<R>(request)
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-        MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
-    query: Q,
-    path: P,
-    body: B,
-    crossinline block: (Request) -> Request = { it },
-): R {
+    MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+        query: Q,
+        path: P,
+        body: B,
+        crossinline block: Request.Builder.() -> Unit
+    ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
-        val finalUrl = appendQueryParameters(newUrlString, this@invoke, query)
+        val finalUrl = appendQueryParametersOkHttp(newUrlString, this@invoke, query)
         val request = buildMutationRequest(finalUrl, methodType, body, block)
         requestAndDecode<R>(request)
     }
 }
 
-context(route: HttpHandler)
+context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
     path: P,
     body: B,
-    crossinline block: (Request) -> Request = { it },
+    crossinline block: Request.Builder.() -> Unit
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -125,27 +151,32 @@ suspend inline operator fun <reified R : Any, reified B : Any, P : Any> Mutation
     }
 }
 
+// -------------------- Internal helpers --------------------
+
 @PublishedApi
-internal fun SafeMethodType.toHttp4kMethod(): Method = when (this) {
-    SafeMethodType.GET -> Method.GET
-    SafeMethodType.OPTIONS -> Method.OPTIONS
+internal fun SafeMethodType.toOkHttpMethod(): String = when (this) {
+    SafeMethodType.GET -> "GET"
+    SafeMethodType.OPTIONS -> "OPTIONS"
 }
 
 @PublishedApi
-internal fun MutationMethodType.toHttp4kMethod(hasBody: Boolean): Method = when (this) {
-    MutationMethodType.POST -> Method.POST
-    MutationMethodType.PUT -> Method.PUT
-    MutationMethodType.PATCH -> Method.PATCH
-    MutationMethodType.DELETE -> if (hasBody) Method.DELETE else Method.DELETE
+internal fun MutationMethodType.toOkHttpMethod(hasBody: Boolean): String = when (this) {
+    MutationMethodType.POST -> "POST"
+    MutationMethodType.PUT -> "PUT"
+    MutationMethodType.PATCH -> "PATCH"
+    MutationMethodType.DELETE -> if (hasBody) "DELETE" else "DELETE"
 }
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal suspend inline fun <reified R : Any> HttpHandler.requestAndDecode(request: Request): R {
+internal suspend inline fun <reified R : Any> OkHttpClient.requestAndDecode(request: Request): R {
     return withContext(Dispatchers.IO) {
-        val response: Response = this@requestAndDecode(request)
-        if (response.status.successful) {
-            val body = response.bodyString()
+        val response: Response = newCall(request).execute()
+        response.use {
+            check(it.isSuccessful) {
+                "HTTP ${'$'}{it.code}: ${'$'}{it.message}"
+            }
+            val body = it.body?.string() ?: ""
             @Suppress("UNCHECKED_CAST")
             when (R::class) {
                 String::class -> body as R
@@ -155,20 +186,17 @@ internal suspend inline fun <reified R : Any> HttpHandler.requestAndDecode(reque
                     JsonCodec.decodeFromString(deserializer, body)
                 }
             }
-        } else {
-            error("HTTP error ${'$'}{response.status.code}: ${'$'}{response.bodyString()}")
         }
     }
 }
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal inline fun <reified B : Any> buildRequestBody(body: B): Pair<List<Pair<String, String>>, String?> {
-    if (body is Unit) return emptyList<Pair<String, String>>() to null
+internal inline fun <reified B : Any> buildRequestBody(body: B): RequestBody? {
+    if (body is Unit) return null
     val serializer = B::class.serializer()
     val json = JsonCodec.encodeToString(serializer, body)
-    val headers = listOf("Content-Type" to "application/json")
-    return headers to json
+    return json.toRequestBody("application/json".toMediaType())
 }
 
 @PublishedApi
@@ -177,47 +205,50 @@ internal inline fun <reified B : Any> buildMutationRequest(
     urlString: String,
     methodType: MutationMethodType,
     body: B,
-    crossinline block: (Request) -> Request = { it },
+    crossinline block: Request.Builder.() -> Unit
 ): Request {
-    val (headers, bodyContent) = buildRequestBody(body)
-    val method = methodType.toHttp4kMethod(body !is Unit)
-    var req = Request(method, Uri.of(urlString))
-    headers.forEach { (k, v) -> req = req.header(k, v) }
-    if (bodyContent != null) req = req.body(bodyContent)
-    req = block(req)
-    return req
+    val hasBody = body !is Unit
+    val requestBody = buildRequestBody(body)
+    val builder = Request.Builder()
+        .url(urlString)
+        .apply(block)
+
+    return when (val method = methodType.toOkHttpMethod(hasBody)) {
+        "POST" -> builder.post(requestBody ?: "".toRequestBody(null)).build()
+        "PUT" -> builder.put(requestBody ?: "".toRequestBody(null)).build()
+        "PATCH" -> builder.patch(requestBody ?: "".toRequestBody(null)).build()
+        "DELETE" -> if (requestBody != null) builder.delete(requestBody).build() else builder.delete().build()
+        else -> builder.method(method, requestBody).build()
+    }
 }
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal fun <Q : Any> appendQueryParameters(urlString: String, api: WithQueryApi<Q>, query: Q): String {
+internal fun <Q : Any> appendQueryParametersOkHttp(
+    urlString: String,
+    api: WithQueryApi<Q>,
+    query: Q
+): String {
     val params = encodeQueryParams(query, api.queryClass)
-    val hasQuery = urlString.contains("?")
-    val sb = StringBuilder(urlString)
-    var first = !hasQuery
+    val base = urlString.toHttpUrlOrNull()
+        ?: throw IllegalArgumentException("Invalid absolute URL for OkHttp: ${'$'}urlString")
+    val b = base.newBuilder()
     params.forEach { (key, values) ->
-        values.forEach { v ->
-            sb.append(if (first) "?" else "&")
-            first = false
-            sb.append(URLEncoder.encode(key, "UTF-8"))
-                .append("=")
-                .append(URLEncoder.encode(v, "UTF-8"))
-        }
+        values.forEach { v -> b.addQueryParameter(key, v) }
     }
-    return sb.toString()
+    return b.build().toString()
 }
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
 internal fun <P : Any> buildPathUrlString(path: P, pathClass: KClass<P>, urlString: String): String {
-    val params = encodeQueryParams(path, pathClass)
-    return params.entries.fold(urlString) { acc, (key, value) ->
-        acc.replace("{$key}", value.firstOrNull() ?: "")
+    val pathParams = encodeQueryParams(path, pathClass)
+    return pathParams.toList().fold(urlString) { acc, (key, value) ->
+        acc.replace("{$key}", value.first())
     }
 }
 
-// Local copy of query encoder
-@PublishedApi
+// Local copy of a query encoder to avoid depending on :ktor:client
 @OptIn(InternalSerializationApi::class)
 internal fun <T : Any> encodeQueryParams(value: T, clazz: KClass<T>): Map<String, List<String>> {
     val serializer = clazz.serializer()
@@ -226,41 +257,34 @@ internal fun <T : Any> encodeQueryParams(value: T, clazz: KClass<T>): Map<String
     return encoder.map
 }
 
-@PublishedApi
 @OptIn(InternalSerializationApi::class)
 internal class CustomParameterEncoder<T : Any>(
     clazz: KClass<T>,
-    serializer: KSerializer<T>,
+    serializer: KSerializer<T>
 ) : NamedValueEncoder() {
     val map = mutableMapOf<String, MutableList<String>>()
 
-    override val serializersModule: SerializersModule = serializersModuleOf(clazz, serializer)
+    override val serializersModule: SerializersModule =
+        serializersModuleOf(clazz, serializer)
 
     override fun encodeTaggedValue(tag: String, value: Any) {
         val newTag = tag.substringBeforeLast(".")
         when (value) {
             is Iterable<*> -> value.forEach { item ->
-                if (item != null) map.getOrPut(
-                    newTag
-                ) { mutableListOf() }.add(item.toString())
+                if (item != null) map.getOrPut(newTag) { mutableListOf() }.add(item.toString())
             }
-
             is Array<*> -> value.forEach { item ->
-                if (item != null) map.getOrPut(
-                    newTag
-                ) { mutableListOf() }.add(item.toString())
+                if (item != null) map.getOrPut(newTag) { mutableListOf() }.add(item.toString())
             }
-
             else -> map.getOrPut(newTag) { mutableListOf() }.add(value.toString())
         }
     }
 
     override fun encodeTaggedEnum(tag: String, enumDescriptor: SerialDescriptor, ordinal: Int) {
-        val newTag = tag.substringBeforeLast(".")
-        map.getOrPut(newTag) { mutableListOf() }.add(enumDescriptor.getElementName(ordinal))
+        map.getOrPut(tag) { mutableListOf() }.add(enumDescriptor.getElementName(ordinal))
     }
 
     override fun encodeTaggedNull(tag: String) {
-        // ignore nulls
+        // skip nulls
     }
 }

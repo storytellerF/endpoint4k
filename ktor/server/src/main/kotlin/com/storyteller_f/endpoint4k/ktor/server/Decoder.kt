@@ -1,4 +1,4 @@
-package com.storyteller_f.route4k.ktor.server
+package com.storyteller_f.endpoint4k.ktor.server
 
 import io.ktor.http.Parameters
 import kotlinx.serialization.ExperimentalSerializationApi

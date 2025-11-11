@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-group = "com.storyteller_f.route4k"
+group = "com.storyteller_f.endpoint4k"
 version = "1.0-SNAPSHOT"
 
 val detektReportMergeSarif by tasks.registering(ReportMergeTask::class) {

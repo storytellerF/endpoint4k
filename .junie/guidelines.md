@@ -1,4 +1,4 @@
-# Project Guidelines (route4k)
+# Project Guidelines (endpoint4k)
 
 This document captures project-specific knowledge to speed up builds, testing, and development for contributors.
 
@@ -60,7 +60,7 @@ Notes:
 - Ktor path:
   - The `ktor` module contains comprehensive integration-style tests. See `ktor/src/test/kotlin/KtorRouteTest.kt` for patterns:
     - Uses `io.ktor.server.testing.testApplication { ... }` to spin up an in-memory Ktor server.
-    - Client calls are made via the helpers in `ktor:client` using context receivers (import `com.storyteller_f.route4k.ktor.client.invoke as invoke2` for disambiguation in tests).
+    - Client calls are made via the helpers in `ktor:client` using context receivers (import `com.storyteller_f.endpoint4k.ktor.client.invoke as invoke2` for disambiguation in tests).
     - Content negotiation is set up via `kotlinx.serialization` (JSON) for both client and server in tests.
   - Logging in tests: `ktor/src/test/resources/logback.xml` configures Logback for test runs.
 - OkHttp path:

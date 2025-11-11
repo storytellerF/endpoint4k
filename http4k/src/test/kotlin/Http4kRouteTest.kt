@@ -1,10 +1,10 @@
-import com.storyteller_f.route4k.common.MutationMethodType
-import com.storyteller_f.route4k.common.mutationApi
-import com.storyteller_f.route4k.common.mutationApiWithQueryAndPath
-import com.storyteller_f.route4k.common.safeApi
-import com.storyteller_f.route4k.common.safeApiWithQuery
-import com.storyteller_f.route4k.common.safeApiWithQueryAndPath
-import com.storyteller_f.route4k.http4k.server.receiveBody
+import com.storyteller_f.endpoint4k.common.MutationMethodType
+import com.storyteller_f.endpoint4k.common.mutationApi
+import com.storyteller_f.endpoint4k.common.mutationApiWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.safeApi
+import com.storyteller_f.endpoint4k.common.safeApiWithQuery
+import com.storyteller_f.endpoint4k.common.safeApiWithQueryAndPath
+import com.storyteller_f.endpoint4k.http4k.server.receiveBody
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -14,8 +14,8 @@ import org.http4k.core.Status
 import org.http4k.routing.routes
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import com.storyteller_f.route4k.http4k.client.invoke as invoke3
-import com.storyteller_f.route4k.http4k.server.invoke as serverInvoke
+import com.storyteller_f.endpoint4k.http4k.client.invoke as invoke3
+import com.storyteller_f.endpoint4k.http4k.server.invoke as serverInvoke
 
 class Http4kRouteTest {
 

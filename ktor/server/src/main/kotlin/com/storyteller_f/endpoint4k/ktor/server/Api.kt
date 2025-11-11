@@ -1,8 +1,8 @@
 @file:Suppress("detekt.formatting")
 
-package com.storyteller_f.route4k.ktor.server
+package com.storyteller_f.endpoint4k.ktor.server
 
-import com.storyteller_f.route4k.common.*
+import com.storyteller_f.endpoint4k.common.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

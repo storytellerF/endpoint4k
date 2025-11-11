@@ -1,8 +1,8 @@
-# route4k
+# endpoint4k
 
-[![](https://jitpack.io/v/storytellerF/route4k.svg)](https://jitpack.io/#storytellerF/route4k)
+[![](https://jitpack.io/v/storytellerF/endpoint4k.svg)](https://jitpack.io/#storytellerF/endpoint4k)
 
-`route4k` is a type-safe routing library for [Ktor](https://ktor.io/). It allows you to share API definitions between your server and client, simplifying the development of web applications and reducing runtime errors caused by API mismatches.
+`endpoint4k` is a type-safe routing library for [Ktor](https://ktor.io/). It allows you to share API definitions between your server and client, simplifying the development of web applications and reducing runtime errors caused by API mismatches.
 
 ## Features
 
@@ -28,15 +28,15 @@ dependencyResolutionManagement {
 Then, add the following dependencies to your module's `build.gradle.kts` file:
 
 ```kotlin
-val route4kVersion = "1.0-SNAPSHOT"
+val endpoint4kVersion = "1.0-SNAPSHOT"
 // common
-implementation("com.github.storytellerF.route4k:common:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:common:$endpoint4kVersion")
 
 // ktor server
-implementation("com.github.storytellerF.route4k:ktor-server:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:ktor-server:$endpoint4kVersion")
 
 // ktor client
-implementation("com.github.storytellerF.route4k:ktor-client:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:ktor-client:$endpoint4kVersion")
 ```
 
 ## Usage Example
@@ -48,7 +48,7 @@ Here is a complete example demonstrating how to define an API, implement it on t
 First, define your API endpoints in a shared module (e.g., `commonMain`). This includes data classes and the API routes themselves.
 
 ```kotlin
-import com.storyteller_f.route4k.common.*
+import com.storyteller_f.endpoint4k.common.*
 import kotlinx.serialization.Serializable
 
 // --- Data Transfer Objects (DTOs) ---
@@ -82,8 +82,8 @@ On your Ktor server, use the `invoke` operator to implement your defined API.
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.storyteller_f.route4k.ktor.server.invoke // Import route4k's server-side extensions
-import com.storyteller_f.route4k.ktor.server.receiveBody
+import com.storyteller_f.endpoint4k.ktor.server.invoke // Import endpoint4k's server-side extensions
+import com.storyteller_f.endpoint4k.ktor.server.receiveBody
 
 fun Application.configureRouting() {
     routing {
@@ -129,7 +129,7 @@ In your Ktor client, also use the `invoke` operator to safely call the API.
 
 ```kotlin
 import io.ktor.client.*
-import com.storyteller_f.route4k.ktor.client.invoke
+import com.storyteller_f.endpoint4k.ktor.client.invoke
 
 suspend fun main() {
     val client = HttpClient {
@@ -154,4 +154,4 @@ suspend fun main() {
 }
 ```
 
-In this way, `route4k` ensures that the API calls between the server and client are consistent and type-safe in terms of parameters, paths, and return types.
+In this way, `endpoint4k` ensures that the API calls between the server and client are consistent and type-safe in terms of parameters, paths, and return types.

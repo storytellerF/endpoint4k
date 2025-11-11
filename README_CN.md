@@ -1,8 +1,8 @@
-# route4k
+# endpoint4k
 
-[![](https://jitpack.io/v/storytellerF/route4k.svg)](https://jitpack.io/#storytellerF/route4k)
+[![](https://jitpack.io/v/storytellerF/endpoint4k.svg)](https://jitpack.io/#storytellerF/endpoint4k)
 
-`route4k` 是一个为 [Ktor](https://ktor.io/) 设计的类型安全路由库。它允许您在服务器和客户端之间共享 API 定义，从而简化 Web 应用程序的开发，减少因 API 不匹配而导致的运行时错误。
+`endpoint4k` 是一个为 [Ktor](https://ktor.io/) 设计的类型安全路由库。它允许您在服务器和客户端之间共享 API 定义，从而简化 Web 应用程序的开发，减少因 API 不匹配而导致的运行时错误。
 
 ## 特性
 
@@ -28,15 +28,15 @@ dependencyResolutionManagement {
 然后，将以下依赖项添加到您的模块 `build.gradle.kts` 文件中：
 
 ```kotlin
-val route4kVersion = "1.0-SNAPSHOT"
+val endpoint4kVersion = "1.0-SNAPSHOT"
 // common
-implementation("com.github.storytellerF.route4k:common:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:common:$endpoint4kVersion")
 
 // ktor server
-implementation("com.github.storytellerF.route4k:ktor-server:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:ktor-server:$endpoint4kVersion")
 
 // ktor client
-implementation("com.github.storytellerF.route4k:ktor-client:$route4kVersion")
+implementation("com.github.storytellerF.endpoint4k:ktor-client:$endpoint4kVersion")
 ```
 
 ## 使用示例
@@ -48,7 +48,7 @@ implementation("com.github.storytellerF.route4k:ktor-client:$route4kVersion")
 首先，在一个共享模块中（例如 `commonMain`）定义您的 API 端点。这包括数据类和 API 路由本身。
 
 ```kotlin
-import com.storyteller_f.route4k.common.*
+import com.storyteller_f.endpoint4k.common.*
 import kotlinx.serialization.Serializable
 
 // --- 数据传输对象 (DTOs) ---
@@ -82,8 +82,8 @@ object UserApi {
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.storyteller_f.route4k.ktor.server.invoke // 导入 route4k 的服务器端扩展
-import com.storyteller_f.route4k.ktor.server.receiveBody
+import com.storyteller_f.endpoint4k.ktor.server.invoke // 导入 endpoint4k 的服务器端扩展
+import com.storyteller_f.endpoint4k.ktor.server.receiveBody
 
 fun Application.configureRouting() {
     routing {
@@ -129,7 +129,7 @@ fun Application.configureRouting() {
 
 ```kotlin
 import io.ktor.client.*
-import com.storyteller_f.route4k.ktor.client.invoke
+import com.storyteller_f.endpoint4k.ktor.client.invoke
 
 suspend fun main() {
     val client = HttpClient {
@@ -154,4 +154,4 @@ suspend fun main() {
 }
 ```
 
-通过这种方式，`route4k` 确保了服务器和客户端之间的 API 调用在参数、路径和返回类型上都是一致和类型安全的。
+通过这种方式，`endpoint4k` 确保了服务器和客户端之间的 API 调用在参数、路径和返回类型上都是一致和类型安全的。

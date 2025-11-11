@@ -1,9 +1,9 @@
-import com.storyteller_f.route4k.common.MutationMethodType
-import com.storyteller_f.route4k.common.mutationApi
-import com.storyteller_f.route4k.common.mutationApiWithQueryAndPath
-import com.storyteller_f.route4k.common.safeApi
-import com.storyteller_f.route4k.common.safeApiWithQuery
-import com.storyteller_f.route4k.common.safeApiWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.MutationMethodType
+import com.storyteller_f.endpoint4k.common.mutationApi
+import com.storyteller_f.endpoint4k.common.mutationApiWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.safeApi
+import com.storyteller_f.endpoint4k.common.safeApiWithQuery
+import com.storyteller_f.endpoint4k.common.safeApiWithQueryAndPath
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -16,7 +16,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import com.storyteller_f.route4k.okhttp.invoke as invoke2
+import com.storyteller_f.endpoint4k.okhttp.invoke as invoke2
 
 class OkHttpRouteTest {
     private lateinit var server: MockWebServer

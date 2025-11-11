@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "route4k"
+rootProject.name = "endpoint4k"
 include(":common")
 include(":ktor:client")
 include(":ktor:server")

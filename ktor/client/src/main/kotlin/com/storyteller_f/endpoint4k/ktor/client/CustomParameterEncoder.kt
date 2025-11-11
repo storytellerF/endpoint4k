@@ -1,4 +1,4 @@
-package com.storyteller_f.route4k.ktor.client
+package com.storyteller_f.endpoint4k.ktor.client
 
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer

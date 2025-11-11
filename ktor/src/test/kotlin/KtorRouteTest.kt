@@ -1,7 +1,7 @@
-import com.storyteller_f.route4k.common.*
-import com.storyteller_f.route4k.ktor.client.json
-import com.storyteller_f.route4k.ktor.server.invoke
-import com.storyteller_f.route4k.ktor.server.receiveBody
+import com.storyteller_f.endpoint4k.common.*
+import com.storyteller_f.endpoint4k.ktor.client.json
+import com.storyteller_f.endpoint4k.ktor.server.invoke
+import com.storyteller_f.endpoint4k.ktor.server.receiveBody
 import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -13,7 +13,7 @@ import io.ktor.server.testing.*
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import com.storyteller_f.route4k.ktor.client.invoke as invoke2
+import com.storyteller_f.endpoint4k.ktor.client.invoke as invoke2
 
 class KtorRouteTest {
     @Serializable

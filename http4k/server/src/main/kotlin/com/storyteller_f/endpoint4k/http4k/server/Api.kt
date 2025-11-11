@@ -1,6 +1,6 @@
-package com.storyteller_f.route4k.http4k.server
+package com.storyteller_f.endpoint4k.http4k.server
 
-import com.storyteller_f.route4k.common.*
+import com.storyteller_f.endpoint4k.common.*
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.modules.serializersModuleOf
