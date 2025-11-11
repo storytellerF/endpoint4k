@@ -1,6 +1,6 @@
 @file:Suppress("detekt.formatting")
 
-package com.storyteller_f.endpoint4k.okhttp
+package com.storyteller_f.endpoint4k.okhttp.client
 
 import com.storyteller_f.endpoint4k.common.*
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,7 @@ internal val JsonCodec: Json = Json { ignoreUnknownKeys = true }
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 @Suppress("NOTHING_TO_INLINE")
-suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
+suspend inline operator fun <reified R : Any> SafeEndpoint<R>.invoke(): R {
     return with(route) {
         val request = Request.Builder()
             .url(urlString)
@@ -51,7 +51,7 @@ suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(query: Q): R {
+suspend inline operator fun <reified R : Any, Q : Any> SafeEndpointWithQuery<R, Q>.invoke(query: Q): R {
     return with(route) {
         val finalUrl = appendQueryParametersOkHttp(urlString, this@invoke, query)
         val request = Request.Builder()
@@ -64,7 +64,7 @@ suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.in
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
+suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeEndpointWithQueryAndPath<R, Q, P>.invoke(
     query: Q,
     path: P
 ): R {
@@ -81,7 +81,7 @@ suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQuery
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.invoke(path: P): R {
+suspend inline operator fun <reified R : Any, P : Any> SafeEndpointWithPath<R, P>.invoke(path: P): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
         val request = Request.Builder()
@@ -96,7 +96,7 @@ suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.inv
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any> MutationEndpoint<R, B>.invoke(
     body: B,
     crossinline block: Request.Builder.() -> Unit
 ): R {
@@ -108,7 +108,7 @@ suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationEndpointWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
     crossinline block: Request.Builder.() -> Unit
@@ -123,7 +123,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> Mutation
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-    MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+    MutationEndpointWithQueryAndPath<R, B, Q, P>.invoke(
         query: Q,
         path: P,
         body: B,
@@ -139,7 +139,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
 
 context(route: OkHttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationEndpointWithPath<R, B, P>.invoke(
     path: P,
     body: B,
     crossinline block: Request.Builder.() -> Unit
@@ -226,7 +226,7 @@ internal inline fun <reified B : Any> buildMutationRequest(
 @OptIn(InternalSerializationApi::class)
 internal fun <Q : Any> appendQueryParametersOkHttp(
     urlString: String,
-    api: WithQueryApi<Q>,
+    api: WithQueryEndpoint<Q>,
     query: Q
 ): String {
     val params = encodeQueryParams(query, api.queryClass)

@@ -67,10 +67,10 @@ data class CreateUserRequest(val name: String) // For the request body
 // --- API Definition ---
 object UserApi {
     // GET /users/{id}?name=...
-    val getUser = safeApiWithQueryAndPath<User, UserQuery, UserPath>("/users/{id}")
+    val getUser = safeEndpoinkWithQueryAndPath<User, UserQuery, UserPath>("/users/{id}")
 
     // POST /users
-    val createUser = mutationApi<User, CreateUserRequest>("/users")
+    val createUser = mutationEndpoint<User, CreateUserRequest>("/users")
 }
 ```
 

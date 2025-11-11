@@ -91,15 +91,15 @@ Notes:
 3. Run only that test:
    - `./gradlew.bat :ktor:test --tests "SimpleGuidelinesTest"`
 4. For Ktor route tests, mirror the structure in `KtorRouteTest.kt`:
-   - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+   - Define route APIs via `safeEndpoint`, `mutationEndpoint`, and their `WithPath/WithQuery` variants from `common`.
    - Use server-side helpers from `ktor:server` (`invoke`, `receiveBody`).
    - Use client-side helpers from `ktor:client` (context receiver `HttpClient`), and set content type or body as needed.
 5. For OkHttp route tests, mirror the structure in `OkHttpRouteTest.kt`:
-  - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+  - Define route APIs via `safeEndpoint`, `mutationEndpoint`, and their `WithPath/WithQuery` variants from `common`.
   - Use `MockWebServer` to provide endpoints; build URLs from `server.url("/path")`.
   - Use client-side helpers from `okhttp:client` (context receiver `OkHttpClient`). Optional headers can be added in the request builder lambda parameter.
 6. For http4k route tests, mirror the structure in `Http4kRouteTest.kt`:
-  - Define route APIs via `safeApi`, `mutationApi`, and their `WithPath/WithQuery` variants from `common`.
+  - Define route APIs via `safeEndpoint`, `mutationEndpoint`, and their `WithPath/WithQuery` variants from `common`.
   - Use in-process http4k routing via the server helpers in `http4k:server` (`invoke`, `receiveBody`).
   - Use client-side helpers from `http4k:client` (no context receiver). Optional headers can be set on the http4k Request in the builder lambda.
 

@@ -10,7 +10,7 @@ enum class SafeMethodType {
     GET, OPTIONS
 }
 
-sealed interface AbstractApi<Resp> {
+sealed interface AbstractEndpoint<Resp> {
     val urlString: String
 }
 
@@ -26,71 +26,71 @@ sealed interface AbstractApi<Resp> {
  * }
  * ```
  */
-interface AbstractMutationApi<Resp, Body> : AbstractApi<Resp> {
+interface AbstractMutationEndpoint<Resp, Body> : AbstractEndpoint<Resp> {
     val methodType: MutationMethodType
 }
 
-interface AbstractSafeApi<Resp> : AbstractApi<Resp> {
+interface AbstractSafeEndpoint<Resp> : AbstractEndpoint<Resp> {
     val methodType: SafeMethodType
 }
 
-interface WithQueryApi<T : Any> {
+interface WithQueryEndpoint<T : Any> {
     val queryClass: KClass<T>
 }
 
-class SafeApi<Resp : Any>(
+class SafeEndpoint<Resp : Any>(
     override val urlString: String,
     override val methodType: SafeMethodType,
-) : AbstractSafeApi<Resp>
+) : AbstractSafeEndpoint<Resp>
 
-class SafeApiWithQuery<Resp : Any, Query : Any>(
+class SafeEndpointWithQuery<Resp : Any, Query : Any>(
     override val urlString: String,
     override val queryClass: KClass<Query>,
     override val methodType: SafeMethodType,
-) : AbstractSafeApi<Resp>, WithQueryApi<Query>
+) : AbstractSafeEndpoint<Resp>, WithQueryEndpoint<Query>
 
-class SafeApiWithPath<Resp : Any, PathQuery : Any>(
+class SafeEndpointWithPath<Resp : Any, PathQuery : Any>(
     override val urlString: String,
     val pathClass: KClass<PathQuery>,
     override val methodType: SafeMethodType
-) : AbstractSafeApi<Resp>
+) : AbstractSafeEndpoint<Resp>
 
-class SafeApiWithQueryAndPath<Resp : Any, Query : Any, PathQuery : Any>(
+class SafeEndpointWithQueryAndPath<Resp : Any, Query : Any, PathQuery : Any>(
     override val urlString: String,
     override val queryClass: KClass<Query>,
     val pathClass: KClass<PathQuery>,
     override val methodType: SafeMethodType
-) : AbstractSafeApi<Resp>, WithQueryApi<Query>
+) : AbstractSafeEndpoint<Resp>, WithQueryEndpoint<Query>
 
-class MutationApi<Resp : Any, Body : Any>(
+class MutationEndpoint<Resp : Any, Body : Any>(
     override val urlString: String,
     override val methodType: MutationMethodType,
-) : AbstractMutationApi<Resp, Body>
+) : AbstractMutationEndpoint<Resp, Body>
 
-class MutationApiWithQuery<Resp : Any, Body : Any, Query : Any>(
+class MutationEndpointWithQuery<Resp : Any, Body : Any, Query : Any>(
     override val urlString: String,
     override val queryClass: KClass<Query>,
     override val methodType: MutationMethodType,
-) : AbstractMutationApi<Resp, Body>, WithQueryApi<Query>
+) : AbstractMutationEndpoint<Resp, Body>, WithQueryEndpoint<Query>
 
-class MutationApiWithPath<Resp : Any, Body : Any, PathQuery : Any>(
+class MutationEndpointWithPath<Resp : Any, Body : Any, PathQuery : Any>(
     override val urlString: String,
     val pathClass: KClass<PathQuery>,
     override val methodType: MutationMethodType
-) : AbstractMutationApi<Resp, Body>
+) : AbstractMutationEndpoint<Resp, Body>
 
-class MutationApiWithQueryAndPath<Resp : Any, Body : Any, Query : Any, PathQuery : Any>(
+class MutationEndpointWithQueryAndPath<Resp : Any, Body : Any, Query : Any, PathQuery : Any>(
     override val urlString: String,
     override val queryClass: KClass<Query>,
     val pathClass: KClass<PathQuery>,
     override val methodType: MutationMethodType
-) : AbstractMutationApi<Resp, Body>, WithQueryApi<Query>
+) : AbstractMutationEndpoint<Resp, Body>, WithQueryEndpoint<Query>
 
-inline fun <Resp : Any, reified Query : Any, reified PathQuery : Any> safeApiWithQueryAndPath(
+inline fun <Resp : Any, reified Query : Any, reified PathQuery : Any> safeEndpointWithQueryAndPath(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET
-): SafeApiWithQueryAndPath<Resp, Query, PathQuery> {
-    return SafeApiWithQueryAndPath(
+): SafeEndpointWithQueryAndPath<Resp, Query, PathQuery> {
+    return SafeEndpointWithQueryAndPath(
         path,
         Query::class,
         PathQuery::class,
@@ -98,41 +98,41 @@ inline fun <Resp : Any, reified Query : Any, reified PathQuery : Any> safeApiWit
     )
 }
 
-inline fun <Resp : Any, reified Query : Any> safeApiWithQuery(
+inline fun <Resp : Any, reified Query : Any> safeEndpointWithQuery(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET
-): SafeApiWithQuery<Resp, Query> {
-    return SafeApiWithQuery(
+): SafeEndpointWithQuery<Resp, Query> {
+    return SafeEndpointWithQuery(
         path,
         Query::class,
         methodType
     )
 }
 
-inline fun <Resp : Any, reified Path : Any> safeApiWithPath(
+inline fun <Resp : Any, reified Path : Any> safeEndpointWithPath(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET
-): SafeApiWithPath<Resp, Path> = SafeApiWithPath(
+): SafeEndpointWithPath<Resp, Path> = SafeEndpointWithPath(
     path,
     Path::class,
     methodType
 )
 
-fun <Resp : Any> safeApi(
+fun <Resp : Any> safeEndpoint(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET
-): SafeApi<Resp> {
-    return SafeApi(
+): SafeEndpoint<Resp> {
+    return SafeEndpoint(
         path,
         methodType
     )
 }
 
-inline fun <Resp : Any, Body : Any, reified Query : Any, reified PathQuery : Any> mutationApiWithQueryAndPath(
+inline fun <Resp : Any, Body : Any, reified Query : Any, reified PathQuery : Any> mutationEndpointWithQueryAndPath(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST
-): MutationApiWithQueryAndPath<Resp, Body, Query, PathQuery> {
-    return MutationApiWithQueryAndPath(
+): MutationEndpointWithQueryAndPath<Resp, Body, Query, PathQuery> {
+    return MutationEndpointWithQueryAndPath(
         path,
         Query::class,
         PathQuery::class,
@@ -140,31 +140,31 @@ inline fun <Resp : Any, Body : Any, reified Query : Any, reified PathQuery : Any
     )
 }
 
-inline fun <Resp : Any, Body : Any, reified Query : Any> mutationApiWithQuery(
+inline fun <Resp : Any, Body : Any, reified Query : Any> mutationEndpointWithQuery(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST
-): MutationApiWithQuery<Resp, Body, Query> {
-    return MutationApiWithQuery(
+): MutationEndpointWithQuery<Resp, Body, Query> {
+    return MutationEndpointWithQuery(
         path,
         Query::class,
         methodType
     )
 }
 
-inline fun <Resp : Any, Body : Any, reified Path : Any> mutationApiWithPath(
+inline fun <Resp : Any, Body : Any, reified Path : Any> mutationEndpointWithPath(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST
-): MutationApiWithPath<Resp, Body, Path> = MutationApiWithPath(
+): MutationEndpointWithPath<Resp, Body, Path> = MutationEndpointWithPath(
     path,
     Path::class,
     methodType
 )
 
-fun <Resp : Any, Body : Any> mutationApi(
+fun <Resp : Any, Body : Any> mutationEndpoint(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST
-): MutationApi<Resp, Body> {
-    return MutationApi(
+): MutationEndpoint<Resp, Body> {
+    return MutationEndpoint(
         path,
         methodType
     )

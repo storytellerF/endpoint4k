@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
+operator fun <R : Any, Q : Any, P : Any> SafeEndpointWithQueryAndPath<R, Q, P>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
     block: suspend RoutingContext.(Q, P) -> Result<R?>?
 ) {
@@ -31,7 +31,7 @@ operator fun <R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(
+operator fun <R : Any, Q : Any> SafeEndpointWithQuery<R, Q>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
     block: suspend RoutingContext.(Q) -> Result<R?>?
 ) {
@@ -45,7 +45,7 @@ operator fun <R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, P : Any> SafeApiWithPath<R, P>.invoke(
+operator fun <R : Any, P : Any> SafeEndpointWithPath<R, P>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
     block: suspend RoutingContext.(P) -> Result<R?>?
 ) {
@@ -59,7 +59,7 @@ operator fun <R : Any, P : Any> SafeApiWithPath<R, P>.invoke(
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any> SafeApi<R>.invoke(
+operator fun <R : Any> SafeEndpoint<R>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
     block: suspend RoutingContext.() -> Result<R?>?
 ) {
@@ -70,9 +70,9 @@ operator fun <R : Any> SafeApi<R>.invoke(
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, Q : Any, P : Any> MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+operator fun <R : Any, B : Any, Q : Any, P : Any> MutationEndpointWithQueryAndPath<R, B, Q, P>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
-    block: suspend RoutingContext.(Q, P, MutationApiWithQueryAndPath<R, B, Q, P>) -> Result<R?>?
+    block: suspend RoutingContext.(Q, P, MutationEndpointWithQueryAndPath<R, B, Q, P>) -> Result<R?>?
 ) {
     route.customMutationBind {
         val q = getQuery(queryClass)
@@ -85,9 +85,9 @@ operator fun <R : Any, B : Any, Q : Any, P : Any> MutationApiWithQueryAndPath<R,
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
+operator fun <R : Any, B : Any, Q : Any> MutationEndpointWithQuery<R, B, Q>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
-    block: suspend RoutingContext.(Q, MutationApiWithQuery<R, B, Q>) -> Result<R?>?
+    block: suspend RoutingContext.(Q, MutationEndpointWithQuery<R, B, Q>) -> Result<R?>?
 ) {
     route.customMutationBind {
         val q = getQuery(queryClass)
@@ -99,9 +99,9 @@ operator fun <R : Any, B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
+operator fun <R : Any, B : Any, P : Any> MutationEndpointWithPath<R, B, P>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
-    block: suspend RoutingContext.(P, MutationApiWithPath<R, B, P>) -> Result<R?>?
+    block: suspend RoutingContext.(P, MutationEndpointWithPath<R, B, P>) -> Result<R?>?
 ) {
     route.customMutationBind {
         val p = getPathQuery(pathClass)
@@ -113,9 +113,9 @@ operator fun <R : Any, B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
 
 context(route: Route)
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any> MutationApi<R, B>.invoke(
+operator fun <R : Any, B : Any> MutationEndpoint<R, B>.invoke(
     handleResult: suspend RoutingContext.(Result<R?>) -> Unit,
-    block: suspend RoutingContext.(MutationApi<R, B>) -> Result<R?>?
+    block: suspend RoutingContext.(MutationEndpoint<R, B>) -> Result<R?>?
 ) {
     route.customMutationBind {
         handleRequest(handleResult) {
@@ -124,7 +124,7 @@ operator fun <R : Any, B : Any> MutationApi<R, B>.invoke(
     }
 }
 
-context(api: AbstractMutationApi<Resp, Body>)
+context(api: AbstractMutationEndpoint<Resp, Body>)
 fun <Resp, Body> Route.customMutationBind(handler: RoutingHandler) {
     route(
         api.urlString,
@@ -192,6 +192,6 @@ suspend fun RoutingContext.handleCaughtException(throwable: Throwable) {
 
 context(route: RoutingContext)
 @Suppress("UnusedReceiverParameter")
-suspend inline fun <reified Resp, reified Body> AbstractMutationApi<Resp, Body>.receiveBody(): Body {
+suspend inline fun <reified Resp, reified Body> AbstractMutationEndpoint<Resp, Body>.receiveBody(): Body {
     return route.call.receive()
 }

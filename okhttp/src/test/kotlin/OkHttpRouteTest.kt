@@ -1,9 +1,9 @@
 import com.storyteller_f.endpoint4k.common.MutationMethodType
-import com.storyteller_f.endpoint4k.common.mutationApi
-import com.storyteller_f.endpoint4k.common.mutationApiWithQueryAndPath
-import com.storyteller_f.endpoint4k.common.safeApi
-import com.storyteller_f.endpoint4k.common.safeApiWithQuery
-import com.storyteller_f.endpoint4k.common.safeApiWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.mutationEndpoint
+import com.storyteller_f.endpoint4k.common.mutationEndpointWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.safeEndpoint
+import com.storyteller_f.endpoint4k.common.safeEndpointWithQuery
+import com.storyteller_f.endpoint4k.common.safeEndpointWithQueryAndPath
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -16,7 +16,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import com.storyteller_f.endpoint4k.okhttp.invoke as invoke2
+import com.storyteller_f.endpoint4k.okhttp.client.invoke as invoke2
 
 class OkHttpRouteTest {
     private lateinit var server: MockWebServer
@@ -107,7 +107,7 @@ class OkHttpRouteTest {
     @Test
     fun `test get route`() = runBlocking {
         installDispatcher()
-        val api = safeApi<CommonObject>("$baseUrl/user")
+        val api = safeEndpoint<CommonObject>("$baseUrl/user")
         val result = with(client) { api.invoke2() }
         assertEquals("ok", result.name)
     }
@@ -115,7 +115,7 @@ class OkHttpRouteTest {
     @Test
     fun `test get with path and query route`() = runBlocking {
         installDispatcher()
-        val api = safeApiWithQueryAndPath<CommonObject, CommonQuery, CommonPath>("$baseUrl/user/{id}")
+        val api = safeEndpointWithQueryAndPath<CommonObject, CommonQuery, CommonPath>("$baseUrl/user/{id}")
         val result = with(client) { api.invoke2(CommonQuery("name"), CommonPath(1)) }
         assertEquals("1 name", result.name)
     }
@@ -123,7 +123,7 @@ class OkHttpRouteTest {
     @Test
     fun `test get with query route`() = runBlocking {
         installDispatcher()
-        val api = safeApiWithQuery<CommonObject, CommonQuery>("$baseUrl/user")
+        val api = safeEndpointWithQuery<CommonObject, CommonQuery>("$baseUrl/user")
         val result = with(client) { api.invoke2(CommonQuery("name")) }
         assertEquals("name", result.name)
     }
@@ -131,8 +131,8 @@ class OkHttpRouteTest {
     @Test
     fun `test mut routes`() = runBlocking {
         installDispatcher()
-        val add = mutationApi<CommonObject, CommonObject>("$baseUrl/user")
-        val delete = mutationApi<CommonObject, Unit>("$baseUrl/user", MutationMethodType.DELETE)
+        val add = mutationEndpoint<CommonObject, CommonObject>("$baseUrl/user")
+        val delete = mutationEndpoint<CommonObject, Unit>("$baseUrl/user", MutationMethodType.DELETE)
 
         val added = with(client) { add.invoke2<CommonObject, CommonObject>(CommonObject("add")) { /* no headers */ } }
         assertEquals("add", added.name)
@@ -144,7 +144,7 @@ class OkHttpRouteTest {
     @Test
     fun `test mut with query and path`() = runBlocking {
         installDispatcher()
-        val api = mutationApiWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>("$baseUrl/user/{id}")
+        val api = mutationEndpointWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>("$baseUrl/user/{id}")
         val result = with(client) {
             api.invoke2(CommonQuery("name"), CommonPath(7), CommonObject("body")) { }
         }

@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 // -------------------- Safe APIs --------------------
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
+operator fun <R : Any, Q : Any, P : Any> SafeEndpointWithQueryAndPath<R, Q, P>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
     block: (req: Request, q: Q, p: P) -> Result<R?>?
 ): RoutingHttpHandler {
@@ -33,7 +33,7 @@ operator fun <R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(
+operator fun <R : Any, Q : Any> SafeEndpointWithQuery<R, Q>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
     block: (req: Request, q: Q) -> Result<R?>?
 ): RoutingHttpHandler {
@@ -47,7 +47,7 @@ operator fun <R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, P : Any> SafeApiWithPath<R, P>.invoke(
+operator fun <R : Any, P : Any> SafeEndpointWithPath<R, P>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
     block: (req: Request, p: P) -> Result<R?>?
 ): RoutingHttpHandler {
@@ -61,7 +61,7 @@ operator fun <R : Any, P : Any> SafeApiWithPath<R, P>.invoke(
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any> SafeApi<R>.invoke(
+operator fun <R : Any> SafeEndpoint<R>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
     block: (req: Request) -> Result<R?>?
 ): RoutingHttpHandler {
@@ -72,9 +72,9 @@ operator fun <R : Any> SafeApi<R>.invoke(
 // -------------------- Mutation APIs --------------------
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, Q : Any, P : Any> MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+operator fun <R : Any, B : Any, Q : Any, P : Any> MutationEndpointWithQueryAndPath<R, B, Q, P>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
-    block: (req: Request, q: Q, p: P, api: MutationApiWithQueryAndPath<R, B, Q, P>) -> Result<R?>?
+    block: (req: Request, q: Q, p: P, api: MutationEndpointWithQueryAndPath<R, B, Q, P>) -> Result<R?>?
 ): RoutingHttpHandler {
     val handler: HttpHandler = { req ->
         handleRequest(req, handleResult) {
@@ -87,9 +87,9 @@ operator fun <R : Any, B : Any, Q : Any, P : Any> MutationApiWithQueryAndPath<R,
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
+operator fun <R : Any, B : Any, Q : Any> MutationEndpointWithQuery<R, B, Q>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
-    block: (req: Request, q: Q, api: MutationApiWithQuery<R, B, Q>) -> Result<R?>?
+    block: (req: Request, q: Q, api: MutationEndpointWithQuery<R, B, Q>) -> Result<R?>?
 ): RoutingHttpHandler {
     val handler: HttpHandler = { req ->
         handleRequest(req, handleResult) {
@@ -101,9 +101,9 @@ operator fun <R : Any, B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
+operator fun <R : Any, B : Any, P : Any> MutationEndpointWithPath<R, B, P>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
-    block: (req: Request, p: P, api: MutationApiWithPath<R, B, P>) -> Result<R?>?
+    block: (req: Request, p: P, api: MutationEndpointWithPath<R, B, P>) -> Result<R?>?
 ): RoutingHttpHandler {
     val handler: HttpHandler = { req ->
         handleRequest(req, handleResult) {
@@ -115,9 +115,9 @@ operator fun <R : Any, B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
 }
 
 @OptIn(InternalSerializationApi::class)
-operator fun <R : Any, B : Any> MutationApi<R, B>.invoke(
+operator fun <R : Any, B : Any> MutationEndpoint<R, B>.invoke(
     handleResult: (req: Request, result: Result<R?>) -> Response,
-    block: (req: Request, api: MutationApi<R, B>) -> Result<R?>?
+    block: (req: Request, api: MutationEndpoint<R, B>) -> Result<R?>?
 ): RoutingHttpHandler {
     val handler: HttpHandler = { req -> handleRequest(req, handleResult) { block(req, this@invoke) } }
     return routes(urlString bind methodType.toHttp4kMethod() to handler)
@@ -184,7 +184,7 @@ fun handleCaughtException(e: Exception): Response {
 }
 
 @OptIn(InternalSerializationApi::class)
-inline fun <reified Resp, reified Body : Any> AbstractMutationApi<Resp, Body>.receiveBody(
+inline fun <reified Resp, reified Body : Any> AbstractMutationEndpoint<Resp, Body>.receiveBody(
     request: Request
 ): Body {
     val bodyString = request.bodyString()

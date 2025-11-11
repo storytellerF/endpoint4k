@@ -25,7 +25,7 @@ internal val JsonCodec: Json = Json { ignoreUnknownKeys = true }
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
 @Suppress("NOTHING_TO_INLINE")
-suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
+suspend inline operator fun <reified R : Any> SafeEndpoint<R>.invoke(): R {
     return with(route) {
         val request = Request(methodType.toHttp4kMethod(), Uri.of(urlString))
         requestAndDecode<R>(request)
@@ -34,7 +34,7 @@ suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(query: Q): R {
+suspend inline operator fun <reified R : Any, Q : Any> SafeEndpointWithQuery<R, Q>.invoke(query: Q): R {
     return with(route) {
         val finalUrl = appendQueryParameters(urlString, this@invoke, query)
         val request = Request(methodType.toHttp4kMethod(), Uri.of(finalUrl))
@@ -44,7 +44,7 @@ suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.in
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
+suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeEndpointWithQueryAndPath<R, Q, P>.invoke(
     query: Q,
     path: P,
 ): R {
@@ -58,7 +58,7 @@ suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQuery
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.invoke(path: P): R {
+suspend inline operator fun <reified R : Any, P : Any> SafeEndpointWithPath<R, P>.invoke(path: P): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
         val request = Request(methodType.toHttp4kMethod(), Uri.of(newUrlString))
@@ -70,7 +70,7 @@ suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.inv
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any> MutationEndpoint<R, B>.invoke(
     body: B,
     crossinline block: (Request) -> Request = { it },
 ): R {
@@ -82,7 +82,7 @@ suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationEndpointWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
     crossinline block: (Request) -> Request = { it },
@@ -97,7 +97,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> Mutation
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-        MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+        MutationEndpointWithQueryAndPath<R, B, Q, P>.invoke(
     query: Q,
     path: P,
     body: B,
@@ -113,7 +113,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
 
 context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationEndpointWithPath<R, B, P>.invoke(
     path: P,
     body: B,
     crossinline block: (Request) -> Request = { it },
@@ -190,7 +190,7 @@ internal inline fun <reified B : Any> buildMutationRequest(
 
 @PublishedApi
 @OptIn(InternalSerializationApi::class)
-internal fun <Q : Any> appendQueryParameters(urlString: String, api: WithQueryApi<Q>, query: Q): String {
+internal fun <Q : Any> appendQueryParameters(urlString: String, api: WithQueryEndpoint<Q>, query: Q): String {
     val params = encodeQueryParams(query, api.queryClass)
     val hasQuery = urlString.contains("?")
     val sb = StringBuilder(urlString)

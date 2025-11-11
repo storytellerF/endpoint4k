@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
+suspend inline operator fun <reified R : Any> SafeEndpoint<R>.invoke(): R {
     return with(route) {
         commonSafeRequest(urlString).body<R>()
     }
@@ -21,7 +21,7 @@ suspend inline operator fun <reified R : Any> SafeApi<R>.invoke(): R {
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.invoke(query: Q): R {
+suspend inline operator fun <reified R : Any, Q : Any> SafeEndpointWithQuery<R, Q>.invoke(query: Q): R {
     return with(route) {
         commonSafeRequest(urlString) {
             appendQueryParameters(query)
@@ -31,7 +31,7 @@ suspend inline operator fun <reified R : Any, Q : Any> SafeApiWithQuery<R, Q>.in
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQueryAndPath<R, Q, P>.invoke(
+suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeEndpointWithQueryAndPath<R, Q, P>.invoke(
     query: Q,
     path: P,
 ): R {
@@ -45,7 +45,7 @@ suspend inline operator fun <reified R : Any, Q : Any, P : Any> SafeApiWithQuery
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.invoke(path: P): R {
+suspend inline operator fun <reified R : Any, P : Any> SafeEndpointWithPath<R, P>.invoke(path: P): R {
     val newUrlString = getUrlString(path, pathClass, urlString)
     return with(route) {
         commonSafeRequest(newUrlString).body<R>()
@@ -54,7 +54,7 @@ suspend inline operator fun <reified R : Any, P : Any> SafeApiWithPath<R, P>.inv
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any> MutationEndpoint<R, B>.invoke(
     body: B,
     crossinline block: HttpRequestBuilder.() -> Unit = {},
 ): R {
@@ -70,7 +70,7 @@ suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationEndpointWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
     crossinline block: HttpRequestBuilder.() -> Unit = {},
@@ -89,7 +89,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> Mutation
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
-        MutationApiWithQueryAndPath<R, B, Q, P>.invoke(
+        MutationEndpointWithQueryAndPath<R, B, Q, P>.invoke(
     query: Q,
     path: P,
     body: B,
@@ -109,7 +109,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
 
 context(route: HttpClient)
 @OptIn(InternalSerializationApi::class)
-suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
+suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationEndpointWithPath<R, B, P>.invoke(
     path: P,
     body: B,
     crossinline block: HttpRequestBuilder.() -> Unit = {},
@@ -126,7 +126,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, P : Any> Mutation
 }
 
 context(route: HttpClient)
-suspend fun <Resp, Body> AbstractMutationApi<Resp, Body>.customMutationRequest(
+suspend fun <Resp, Body> AbstractMutationEndpoint<Resp, Body>.customMutationRequest(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {},
 ): HttpResponse {
@@ -144,7 +144,7 @@ suspend fun <Resp, Body> AbstractMutationApi<Resp, Body>.customMutationRequest(
 }
 
 context(route: HttpClient)
-suspend fun <Resp> AbstractSafeApi<Resp>.commonSafeRequest(
+suspend fun <Resp> AbstractSafeEndpoint<Resp>.commonSafeRequest(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {},
 ): HttpResponse {
@@ -169,7 +169,7 @@ fun <P : Any> getUrlString(path: P, pathClass: KClass<P>, urlString: String): St
 }
 
 context(builder: HttpRequestBuilder)
-fun <Q : Any> WithQueryApi<Q>.appendQueryParameters(
+fun <Q : Any> WithQueryEndpoint<Q>.appendQueryParameters(
     query: Q,
 ) {
     val clazz = queryClass
