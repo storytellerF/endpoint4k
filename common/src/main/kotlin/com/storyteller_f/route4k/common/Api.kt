@@ -14,6 +14,18 @@ sealed interface AbstractApi<Resp> {
     val urlString: String
 }
 
+/**
+ * 有时Body 和框架相关，这时最好把Body 设置为Unit，然后手动设置Body
+ * ```
+ * API.Files.upload(
+ *     /* */,
+ *     /* */,
+ *     Unit
+ * ) {
+ *     setBody(ByteReadChannel(input))
+ * }
+ * ```
+ */
 interface AbstractMutationApi<Resp, Body> : AbstractApi<Resp> {
     val methodType: MutationMethodType
 }

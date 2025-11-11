@@ -14,7 +14,7 @@ import org.http4k.core.Status
 import org.http4k.routing.routes
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import com.storyteller_f.route4k.http4k.invoke as invoke3
+import com.storyteller_f.route4k.http4k.client.invoke as invoke3
 import com.storyteller_f.route4k.http4k.server.invoke as serverInvoke
 
 class Http4kRouteTest {

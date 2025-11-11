@@ -1,6 +1,6 @@
 @file:Suppress("detekt.formatting")
 
-package com.storyteller_f.route4k.http4k
+package com.storyteller_f.route4k.http4k.client
 
 import com.storyteller_f.route4k.common.*
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +14,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.serializersModuleOf
 import kotlinx.serialization.serializer
 import org.http4k.core.*
+import java.net.URLEncoder
 import kotlin.reflect.KClass
 
 @PublishedApi
@@ -71,7 +72,7 @@ context(route: HttpHandler)
 @OptIn(InternalSerializationApi::class)
 suspend inline operator fun <reified R : Any, reified B : Any> MutationApi<R, B>.invoke(
     body: B,
-    crossinline block: (Request) -> Request,
+    crossinline block: (Request) -> Request = { it },
 ): R {
     return with(route) {
         val request = buildMutationRequest(urlString, methodType, body, block)
@@ -84,7 +85,7 @@ context(route: HttpHandler)
 suspend inline operator fun <reified R : Any, reified B : Any, Q : Any> MutationApiWithQuery<R, B, Q>.invoke(
     query: Q,
     body: B,
-    crossinline block: (Request) -> Request,
+    crossinline block: (Request) -> Request = { it },
 ): R {
     return with(route) {
         val finalUrl = appendQueryParameters(urlString, this@invoke, query)
@@ -100,7 +101,7 @@ suspend inline operator fun <reified R : Any, reified B : Any, Q : Any, P : Any>
     query: Q,
     path: P,
     body: B,
-    crossinline block: (Request) -> Request,
+    crossinline block: (Request) -> Request = { it },
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -115,7 +116,7 @@ context(route: HttpHandler)
 suspend inline operator fun <reified R : Any, reified B : Any, P : Any> MutationApiWithPath<R, B, P>.invoke(
     path: P,
     body: B,
-    crossinline block: (Request) -> Request,
+    crossinline block: (Request) -> Request = { it },
 ): R {
     val newUrlString = buildPathUrlString(path, pathClass, urlString)
     return with(route) {
@@ -176,7 +177,7 @@ internal inline fun <reified B : Any> buildMutationRequest(
     urlString: String,
     methodType: MutationMethodType,
     body: B,
-    crossinline block: (Request) -> Request,
+    crossinline block: (Request) -> Request = { it },
 ): Request {
     val (headers, bodyContent) = buildRequestBody(body)
     val method = methodType.toHttp4kMethod(body !is Unit)
@@ -198,9 +199,9 @@ internal fun <Q : Any> appendQueryParameters(urlString: String, api: WithQueryAp
         values.forEach { v ->
             sb.append(if (first) "?" else "&")
             first = false
-            sb.append(java.net.URLEncoder.encode(key, "UTF-8"))
+            sb.append(URLEncoder.encode(key, "UTF-8"))
                 .append("=")
-                .append(java.net.URLEncoder.encode(v, "UTF-8"))
+                .append(URLEncoder.encode(v, "UTF-8"))
         }
     }
     return sb.toString()
@@ -211,7 +212,7 @@ internal fun <Q : Any> appendQueryParameters(urlString: String, api: WithQueryAp
 internal fun <P : Any> buildPathUrlString(path: P, pathClass: KClass<P>, urlString: String): String {
     val params = encodeQueryParams(path, pathClass)
     return params.entries.fold(urlString) { acc, (key, value) ->
-        acc.replace("{" + key + "}", value.firstOrNull() ?: "")
+        acc.replace("{$key}", value.firstOrNull() ?: "")
     }
 }
 

@@ -125,7 +125,7 @@ operator fun <R : Any, B : Any> MutationApi<R, B>.invoke(
 }
 
 context(api: AbstractMutationApi<Resp, Body>)
-fun <Resp, Body> Route.customMutationBind(body: RoutingHandler) {
+fun <Resp, Body> Route.customMutationBind(handler: RoutingHandler) {
     route(
         api.urlString,
         when (api.methodType) {
@@ -135,7 +135,7 @@ fun <Resp, Body> Route.customMutationBind(body: RoutingHandler) {
             MutationMethodType.PATCH -> HttpMethod.Patch
         }
     ) {
-        handle(body)
+        handle(handler)
     }
 }
 

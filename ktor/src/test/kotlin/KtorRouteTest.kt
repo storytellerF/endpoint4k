@@ -1,15 +1,8 @@
-import com.storyteller_f.route4k.common.MutationMethodType
-import com.storyteller_f.route4k.common.mutationApi
-import com.storyteller_f.route4k.common.mutationApiWithPath
-import com.storyteller_f.route4k.common.mutationApiWithQuery
-import com.storyteller_f.route4k.common.mutationApiWithQueryAndPath
-import com.storyteller_f.route4k.common.safeApi
-import com.storyteller_f.route4k.common.safeApiWithPath
-import com.storyteller_f.route4k.common.safeApiWithQuery
-import com.storyteller_f.route4k.common.safeApiWithQueryAndPath
+import com.storyteller_f.route4k.common.*
+import com.storyteller_f.route4k.ktor.client.json
 import com.storyteller_f.route4k.ktor.server.invoke
 import com.storyteller_f.route4k.ktor.server.receiveBody
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -126,16 +119,13 @@ class KtorRouteTest {
             assertEquals(
                 "add",
                 customApi.add.invoke2<CommonObject, CommonObject>(
-                    CommonObject("add")
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    CommonObject("add"),
+                    json()
+                ).name
             )
             assertEquals(
                 "delete",
-                customApi.delete.invoke2<CommonObject, Unit>(Unit) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                customApi.delete.invoke2<CommonObject, Unit>(Unit, json()).name
             )
         })
     }
@@ -164,16 +154,13 @@ class KtorRouteTest {
                 "name old",
                 customApi.add.invoke2<CommonObject, CommonObject, CommonQuery>(
                     CommonQuery("name"),
-                    CommonObject("old")
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    CommonObject("old"),
+                    json()
+                ).name
             )
             assertEquals(
                 "name",
-                customApi.delete.invoke2<CommonObject, Unit, CommonQuery>(CommonQuery("name"), Unit) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                customApi.delete.invoke2<CommonObject, Unit, CommonQuery>(CommonQuery("name"), Unit, json()).name
             )
         })
     }
@@ -207,19 +194,17 @@ class KtorRouteTest {
                     CommonQuery("name"),
                     CommonPath(1),
                     CommonObject("old"),
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    json()
+                ).name
             )
             assertEquals(
                 "name1",
                 customApi.delete.invoke2<CommonObject, Unit, CommonQuery, CommonPath>(
                     CommonQuery("name"),
                     CommonPath(1),
-                    Unit
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    Unit,
+                    json()
+                ).name
             )
         })
     }
@@ -252,18 +237,16 @@ class KtorRouteTest {
                 customApi.add.invoke2<CommonObject, CommonObject, CommonPath>(
                     CommonPath(1),
                     CommonObject("old"),
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    json()
+                ).name
             )
             assertEquals(
                 "1",
                 customApi.delete.invoke2<CommonObject, Unit, CommonPath>(
                     CommonPath(1),
-                    Unit
-                ) {
-                    contentType(ContentType.Application.Json)
-                }.name
+                    Unit,
+                    json()
+                ).name
             )
         })
     }
@@ -271,7 +254,7 @@ class KtorRouteTest {
 
 private fun test(
     configuration: Routing.() -> Unit,
-    block: suspend HttpClient.() -> Unit
+    block: suspend HttpClient.() -> Unit,
 ) {
     val module: Application.() -> Unit = {
         install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
