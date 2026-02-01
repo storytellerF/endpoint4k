@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
@@ -13,8 +14,10 @@ dependencyResolutionManagement {
     includeBuild("common-publish")
     @Suppress("UnstableApiUsage")
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
