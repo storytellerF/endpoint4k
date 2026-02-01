@@ -1,20 +1,25 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    id("common-publish")
+    alias(libs.plugins.kotlin.multiplatform)
+    id("common-multiplatform-publish")
 }
 
-dependencies {
-    implementation(project(":common"))
-    implementation(libs.ktor.client.core)
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
 kotlin {
-    jvmToolchain(21)
+    jvm()
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-parameters")
     }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":common"))
+                implementation(libs.ktor.client.core)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+    }
 }
+

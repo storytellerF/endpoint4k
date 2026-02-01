@@ -3,9 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.storyteller_f.endpoint4k"
-version = "1.0-SNAPSHOT"
-
 dependencies {
     testImplementation(project(":common"))
     testImplementation(libs.ktor.server.test.host)
