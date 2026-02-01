@@ -1,15 +1,15 @@
 plugins {
-    kotlin("jvm") version "2.1.21"
-    kotlin("plugin.serialization") version "2.2.0"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
     testImplementation(project(":http4k:client"))
     testImplementation(project(":http4k:server"))
     testImplementation(project(":common"))
-    testImplementation("org.http4k:http4k-core:5.30.0.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    testImplementation(libs.http4k.core)
+    testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.coroutines.core)
     testImplementation(kotlin("test"))
 }
 

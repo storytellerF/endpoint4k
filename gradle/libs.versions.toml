@@ -29,5 +29,6 @@ detekt-rules-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-li
 detekt-rules-ruleauthors = { module = "io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors", version.ref = "detektVersion" }
 
 [plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
-# Keeping plugin versions in build files to minimize changes; declare here if needed later.
