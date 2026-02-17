@@ -6,13 +6,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.androidLibrary)
+    `maven-publish`
     id("common-multiplatform-publish")
 }
 
 kotlin {
     jvm()
     android {
-        namespace = "com.storyteller_f.route4k.ktor.client"
+        namespace = "com.storyteller_f.endpoint4k.ktor.client"
         compileSdk = 35
         minSdk = 24
         compilerOptions {

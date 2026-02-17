@@ -13,7 +13,7 @@ plugins {
 kotlin {
     jvm()
     android {
-        namespace = "com.storyteller_f.route4k.common"
+        namespace = "com.storyteller_f.endpoint4k.common"
         compileSdk = 35
         minSdk = 24
         compilerOptions {
@@ -30,10 +30,6 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
     sourceSets {
-        commonMain {
-            dependencies {
-            }
-        }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
