@@ -38,13 +38,13 @@ This document captures project-specific knowledge to speed up builds, testing, a
   - `./gradlew.bat test`
 - Run tests for a specific module:
   - Common: `./gradlew.bat :common:test`
-  - Ktor client: `./gradlew.bat :ktor:client:test`
-  - Ktor server: `./gradlew.bat :ktor:server:test`
+  - Ktor client: `./gradlew.bat :ktor:ktor-client:test`
+  - Ktor server: `./gradlew.bat :ktor:ktor-server:test`
   - Ktor tests module: `./gradlew.bat :ktor:test`
-  - OkHttp client: `./gradlew.bat :okhttp:client:test`
+  - OkHttp client: `./gradlew.bat :okhttp:okhttp-client:test`
   - OkHttp tests module: `./gradlew.bat :okhttp:test`
-  - http4k client: `./gradlew.bat :http4k:client:test`
-  - http4k server: `./gradlew.bat :http4k:server:test`
+  - http4k client: `./gradlew.bat :http4k:http4k-client:test`
+  - http4k server: `./gradlew.bat :http4k:http4k-server:test`
   - http4k tests module: `./gradlew.bat :http4k:test`
 - Run a specific test class or method (use JUnit Platform `--tests` filter):
   - Ktor class: `./gradlew.bat :ktor:test --tests "KtorRouteTest"`
@@ -127,7 +127,7 @@ Detekt is enabled across all modules and runs as part of the Gradle build.
 - Run detekt on the whole project:
   - `./gradlew.bat detekt`
 - Run detekt for a single module (example):
-  - `./gradlew.bat :ktor:client:detekt`
+  - `./gradlew.bat :ktor:ktor-client:detekt`
 - Auto-correction: The build is configured with `autoCorrect=true`. Detekt will automatically fix issues it can correct (mostly formatting via the formatting ruleset). These auto-correctable issues are ignored as failures; only remaining findings (non-auto-correctable) will fail the build.
 - Config file: Rules are configured via `config/detekt/detekt.yml` at the root. Adjust rule severities or disable rules there if needed for the project.
 - Reports: XML, HTML, TXT, SARIF, and MD reports are generated under each module’s `build/reports/detekt/`. A merged SARIF is also produced at `build/reports/detekt/merge.sarif` at the root for CI code scanning.

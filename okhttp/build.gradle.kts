@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation(project(":okhttp:client"))
+    testImplementation(project(":okhttp:okhttp-client"))
     testImplementation(project(":common"))
     testImplementation(libs.okhttp)
     testImplementation(libs.mockwebserver)

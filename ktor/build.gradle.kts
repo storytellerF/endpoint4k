@@ -6,8 +6,8 @@ plugins {
 dependencies {
     testImplementation(project(":common"))
     testImplementation(libs.ktor.server.test.host)
-    testImplementation(project(":ktor:client"))
-    testImplementation(project(":ktor:server"))
+    testImplementation(project(":ktor:ktor-client"))
+    testImplementation(project(":ktor:ktor-server"))
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.content.negotiation)
     testImplementation(libs.ktor.client.content.negotiation)

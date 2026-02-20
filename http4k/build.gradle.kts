@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-    testImplementation(project(":http4k:client"))
-    testImplementation(project(":http4k:server"))
+    testImplementation(project(":http4k:http4k-client"))
+    testImplementation(project(":http4k:http4k-server"))
     testImplementation(project(":common"))
     testImplementation(libs.http4k.core)
     testImplementation(libs.kotlinx.serialization.json)

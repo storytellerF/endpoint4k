@@ -248,7 +248,7 @@ internal fun <P : Any> buildPathUrlString(path: P, pathClass: KClass<P>, urlStri
     }
 }
 
-// Local copy of a query encoder to avoid depending on :ktor:client
+// Local copy of a query encoder to avoid depending on :ktor:ktor-client
 @OptIn(InternalSerializationApi::class)
 internal fun <T : Any> encodeQueryParams(value: T, clazz: KClass<T>): Map<String, List<String>> {
     val serializer = clazz.serializer()
