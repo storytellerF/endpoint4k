@@ -28,7 +28,9 @@ class KtorRouteTest {
     @Test
     fun `test get route`() {
         val customApi = object {
-            val get = safeEndpoint<CommonObject>("/")
+            val get = safeEndpointBuilder("/") {
+                resp(CommonObject::class)
+            }
         }
 
         test({
@@ -46,7 +48,10 @@ class KtorRouteTest {
     @Test
     fun `test get with path route`() {
         val customApi = object {
-            val get = safeEndpointWithPath<CommonObject, CommonPath>("/user/{id}")
+            val get = safeEndpointWithPathBuilder("/user/{id}") {
+                resp(CommonObject::class)
+                path(CommonPath::class)
+            }
         }
 
         test({
@@ -64,7 +69,11 @@ class KtorRouteTest {
     @Test
     fun `test get with query and path route`() {
         val customApi = object {
-            val get = safeEndpointWithQueryAndPath<CommonObject, CommonQuery, CommonPath>("/user/{id}")
+            val get = safeEndpointWithQueryAndPathBuilder("/user/{id}") {
+                resp(CommonObject::class)
+                query(CommonQuery::class)
+                path(CommonPath::class)
+            }
         }
 
         test({
@@ -82,7 +91,10 @@ class KtorRouteTest {
     @Test
     fun `test get with query route`() {
         val customApi = object {
-            val get = safeEndpointWithQuery<CommonObject, CommonQuery>("/user")
+            val get = safeEndpointWithQueryBuilder("/user") {
+                resp(CommonObject::class)
+                query(CommonQuery::class)
+            }
         }
 
         test({
@@ -100,8 +112,14 @@ class KtorRouteTest {
     @Test
     fun `test mut route`() {
         val customApi = object {
-            val add = mutationEndpoint<CommonObject, CommonObject>("/user")
-            val delete = mutationEndpoint<CommonObject, Unit>("/user", MutationMethodType.DELETE)
+            val add = mutationEndpointBuilder("/user") {
+                resp(CommonObject::class)
+                body(CommonObject::class)
+            }
+            val delete = mutationEndpointBuilder("/user", MutationMethodType.DELETE) {
+                resp(CommonObject::class)
+                body(Unit::class)
+            }
         }
 
         test({
@@ -133,8 +151,16 @@ class KtorRouteTest {
     @Test
     fun `test mut with query route`() {
         val customApi = object {
-            val add = mutationEndpointWithQuery<CommonObject, CommonObject, CommonQuery>("/user")
-            val delete = mutationEndpointWithQuery<CommonObject, Unit, CommonQuery>("/user", MutationMethodType.DELETE)
+            val add = mutationEndpointWithQueryBuilder("/user") {
+                resp(CommonObject::class)
+                body(CommonObject::class)
+                query(CommonQuery::class)
+            }
+            val delete = mutationEndpointWithQueryBuilder("/user", MutationMethodType.DELETE) {
+                resp(CommonObject::class)
+                body(Unit::class)
+                query(CommonQuery::class)
+            }
         }
 
         test({
@@ -168,11 +194,21 @@ class KtorRouteTest {
     @Test
     fun `test mut with query and path route`() {
         val customApi = object {
-            val add = mutationEndpointWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>("/user/{id}")
-            val delete = mutationEndpointWithQueryAndPath<CommonObject, Unit, CommonQuery, CommonPath>(
+            val add = mutationEndpointWithQueryAndPathBuilder("/user/{id}") {
+                resp(CommonObject::class)
+                body(CommonObject::class)
+                query(CommonQuery::class)
+                path(CommonPath::class)
+            }
+            val delete = mutationEndpointWithQueryAndPathBuilder(
                 "/user/{id}",
                 MutationMethodType.DELETE
-            )
+            ) {
+                resp(CommonObject::class)
+                body(Unit::class)
+                query(CommonQuery::class)
+                path(CommonPath::class)
+            }
         }
 
         test({
@@ -212,11 +248,19 @@ class KtorRouteTest {
     @Test
     fun `test mut with path route`() {
         val customApi = object {
-            val add = mutationEndpointWithPath<CommonObject, CommonObject, CommonPath>("/user/{id}")
-            val delete = mutationEndpointWithPath<CommonObject, Unit, CommonPath>(
+            val add = mutationEndpointWithPathBuilder("/user/{id}") {
+                resp(CommonObject::class)
+                body(CommonObject::class)
+                path(CommonPath::class)
+            }
+            val delete = mutationEndpointWithPathBuilder(
                 "/user/{id}",
                 MutationMethodType.DELETE
-            )
+            ) {
+                resp(CommonObject::class)
+                body(Unit::class)
+                path(CommonPath::class)
+            }
         }
 
         test({

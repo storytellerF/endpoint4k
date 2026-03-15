@@ -1,9 +1,13 @@
 import com.storyteller_f.endpoint4k.common.MutationMethodType
-import com.storyteller_f.endpoint4k.common.mutationEndpoint
-import com.storyteller_f.endpoint4k.common.mutationEndpointWithQueryAndPath
-import com.storyteller_f.endpoint4k.common.safeEndpoint
-import com.storyteller_f.endpoint4k.common.safeEndpointWithQuery
-import com.storyteller_f.endpoint4k.common.safeEndpointWithQueryAndPath
+import com.storyteller_f.endpoint4k.common.body
+import com.storyteller_f.endpoint4k.common.mutationEndpointBuilder
+import com.storyteller_f.endpoint4k.common.mutationEndpointWithQueryAndPathBuilder
+import com.storyteller_f.endpoint4k.common.path
+import com.storyteller_f.endpoint4k.common.query
+import com.storyteller_f.endpoint4k.common.resp
+import com.storyteller_f.endpoint4k.common.safeEndpointBuilder
+import com.storyteller_f.endpoint4k.common.safeEndpointWithQueryAndPathBuilder
+import com.storyteller_f.endpoint4k.common.safeEndpointWithQueryBuilder
 import com.storyteller_f.endpoint4k.http4k.server.receiveBody
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -30,8 +34,9 @@ class Http4kRouteTest {
 
     @Test
     fun `test get route`() = runBlocking {
-        // server side
-        val getUser = safeEndpoint<CommonObject>("/user")
+        val getUser = safeEndpointBuilder("/user") {
+            resp(CommonObject::class)
+        }
         val handler: HttpHandler = routes(
             getUser.serverInvoke(handleResult = { _, result ->
                 result.fold(
@@ -43,16 +48,20 @@ class Http4kRouteTest {
                 if (n != null) Result.success(CommonObject(n)) else Result.success(CommonObject("ok"))
             }
         )
-        // client side
-        val api = safeEndpoint<CommonObject>("http://localhost/user")
+        val api = safeEndpointBuilder<CommonObject>("http://localhost/user") {
+            resp(CommonObject::class)
+        }
         val result = with(handler) { api.invoke3() }
         assertEquals("ok", result.name)
     }
 
     @Test
     fun `test get with path and query route`() = runBlocking {
-        // server side
-        val getUserPathQuery = safeEndpointWithQueryAndPath<CommonObject, CommonQuery, CommonPath>("/user/{id}")
+        val getUserPathQuery = safeEndpointWithQueryAndPathBuilder("/user/{id}") {
+            resp(CommonObject::class)
+            query(CommonQuery::class)
+            path(CommonPath::class)
+        }
         val handler: HttpHandler = routes(
             getUserPathQuery.serverInvoke(handleResult = { _, result ->
                 result.fold(
@@ -63,16 +72,20 @@ class Http4kRouteTest {
                 Result.success(CommonObject("${p.id} ${q.name}"))
             }
         )
-        // client side
-        val api = safeEndpointWithQueryAndPath<CommonObject, CommonQuery, CommonPath>("http://localhost/user/{id}")
+        val api = safeEndpointWithQueryAndPathBuilder("http://localhost/user/{id}") {
+            resp(CommonObject::class)
+            query(CommonQuery::class)
+            path(CommonPath::class)
+        }
         val result = with(handler) { api.invoke3(CommonQuery("name"), CommonPath(1)) }
         assertEquals("1 name", result.name)
     }
 
     @Test
     fun `test get with query route`() = runBlocking {
-        // server side
-        val getUser = safeEndpoint<CommonObject>("/user")
+        val getUser = safeEndpointBuilder("/user") {
+            resp(CommonObject::class)
+        }
         val handler: HttpHandler = routes(
             getUser.serverInvoke(handleResult = { _, result ->
                 result.fold(
@@ -84,17 +97,24 @@ class Http4kRouteTest {
                 if (n != null) Result.success(CommonObject(n)) else null
             }
         )
-        // client side
-        val api = safeEndpointWithQuery<CommonObject, CommonQuery>("http://localhost/user")
+        val api = safeEndpointWithQueryBuilder("http://localhost/user") {
+            resp(CommonObject::class)
+            query(CommonQuery::class)
+        }
         val result = with(handler) { api.invoke3(CommonQuery("name")) }
         assertEquals("name", result.name)
     }
 
     @Test
     fun `test mut routes`() = runBlocking {
-        // server side
-        val addUser = mutationEndpoint<CommonObject, CommonObject>("/user")
-        val deleteUser = mutationEndpoint<CommonObject, Unit>("/user", MutationMethodType.DELETE)
+        val addUser = mutationEndpointBuilder("/user") {
+            resp(CommonObject::class)
+            body(CommonObject::class)
+        }
+        val deleteUser = mutationEndpointBuilder("/user", MutationMethodType.DELETE) {
+            resp(CommonObject::class)
+            body(Unit::class)
+        }
         val handler: HttpHandler = routes(
             addUser.serverInvoke(handleResult = { _, result ->
                 result.fold(
@@ -114,9 +134,14 @@ class Http4kRouteTest {
                 Result.success(CommonObject("delete"))
             }
         )
-        // client side
-        val add = mutationEndpoint<CommonObject, CommonObject>("http://localhost/user")
-        val delete = mutationEndpoint<CommonObject, Unit>("http://localhost/user", MutationMethodType.DELETE)
+        val add = mutationEndpointBuilder("http://localhost/user") {
+            resp(CommonObject::class)
+            body(CommonObject::class)
+        }
+        val delete = mutationEndpointBuilder("http://localhost/user", MutationMethodType.DELETE) {
+            resp(CommonObject::class)
+            body(Unit::class)
+        }
 
         val added = with(handler) { add.invoke3<CommonObject, CommonObject>(CommonObject("add")) { it } }
         assertEquals("add", added.name)
@@ -127,10 +152,12 @@ class Http4kRouteTest {
 
     @Test
     fun `test mut with query and path`() = runBlocking {
-        // server side
-        val addUserWithQP = mutationEndpointWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>(
-            "/user/{id}"
-        )
+        val addUserWithQP = mutationEndpointWithQueryAndPathBuilder("/user/{id}") {
+            resp(CommonObject::class)
+            body(CommonObject::class)
+            query(CommonQuery::class)
+            path(CommonPath::class)
+        }
         val handler: HttpHandler = routes(
             addUserWithQP.serverInvoke(handleResult = { _, result ->
                 result.fold(
@@ -142,10 +169,12 @@ class Http4kRouteTest {
                 Result.success(CommonObject("${q.name} ${body.name} ${p.id}"))
             }
         )
-        // client side
-        val api = mutationEndpointWithQueryAndPath<CommonObject, CommonObject, CommonQuery, CommonPath>(
-            "http://localhost/user/{id}"
-        )
+        val api = mutationEndpointWithQueryAndPathBuilder("http://localhost/user/{id}") {
+            resp(CommonObject::class)
+            body(CommonObject::class)
+            query(CommonQuery::class)
+            path(CommonPath::class)
+        }
         val result = with(handler) {
             api.invoke3(CommonQuery("name"), CommonPath(7), CommonObject("body")) { it }
         }

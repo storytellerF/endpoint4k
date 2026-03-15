@@ -14,7 +14,7 @@ kotlin {
     jvm()
     android {
         namespace = "com.storyteller_f.endpoint4k.common"
-        compileSdk = 35
+        compileSdk = 36
         minSdk = 24
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
