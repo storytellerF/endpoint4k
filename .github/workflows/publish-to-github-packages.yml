@@ -44,6 +44,6 @@ jobs:
             -Pgpr.user="${{ github.actor }}" \
             -Pgpr.key="${{ secrets.GITHUB_TOKEN }}" \
             -Pversion="$VERSION" \
-            -Pgroup="com.storytellerF.endpoint4k"
+            -Pgroup="com.storyteller_f.endpoint4k"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
