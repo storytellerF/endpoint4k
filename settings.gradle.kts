@@ -1,5 +1,10 @@
 pluginManagement {
     repositories {
+        maven("https://mirrors.tencent.com/nexus/repository/maven-public/") {
+            content {
+
+            }
+        }
         google()
         mavenLocal()
         mavenCentral()
@@ -11,9 +16,13 @@ plugins {
 }
 
 dependencyResolutionManagement {
-    includeBuild("common-publish")
     @Suppress("UnstableApiUsage")
     repositories {
+        maven("https://mirrors.tencent.com/nexus/repository/maven-public/") {
+            content {
+
+            }
+        }
         google()
         mavenLocal()
         mavenCentral()
@@ -31,3 +40,4 @@ include(":okhttp")
 include(":http4k:http4k-client")
 include(":http4k:http4k-server")
 include(":http4k")
+includeBuild("common-publish")

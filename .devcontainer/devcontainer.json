@@ -1,0 +1,15 @@
+{
+  "name": "endpoint4k Dev Container",
+  "dockerComposeFile": [
+    "./docker-compose.yml"
+  ],
+  "service": "main",
+  "workspaceFolder": "/workspace/endpoint4k",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false
+    }
+  },
+  "remoteUser": "debian"
+}

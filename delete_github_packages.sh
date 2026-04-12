@@ -8,10 +8,11 @@
 
 set -e
 
+
 if [ $# -lt 3 ]; then
-    echo "Usage: $0 <version> <org_or_user> <token> [package_type] [scope]"
+    echo "Usage: $0 <version> <org_or_user> <token> [package_type] [scope] [prefix]"
     echo "Example: $0 1.0.0 myorg ghp_1234567890abcdef maven org"
-    echo "For personal accounts, use scope 'user': $0 1.0.0 myuser ghp_... maven user"
+    echo "For personal accounts, use scope 'user': $0 1.0.0 myuser ghp_... maven user prefix_"
     exit 1
 fi
 
@@ -20,6 +21,7 @@ ORG_OR_USER=$2
 TOKEN=$3
 PACKAGE_TYPE=${4:-maven}
 SCOPE=${5:-org}
+PREFIX=${6:-}
 
 echo "Deleting all $PACKAGE_TYPE packages with version $VERSION from $SCOPE $ORG_OR_USER"
 
@@ -48,35 +50,47 @@ if [ $? -ne 0 ]; then
 fi
 
 for PACKAGE in $PACKAGES; do
+    # 如果是 user scope 且 prefix 非空，且包名不以 prefix 开头，则跳过
+    if [ "$SCOPE" = "user" ] && [ -n "$PREFIX" ]; then
+        case "$PACKAGE" in
+            $PREFIX*)
+                ;; # 符合前缀，继续
+            *)
+                echo "Skipping package (does not match prefix): $PACKAGE"
+                continue
+                ;;
+        esac
+    fi
+
     echo "Processing package: $PACKAGE"
-    
+
     # Get version IDs for the specified version
     if [ "$SCOPE" = "org" ]; then
         VERSIONS_URL="https://api.github.com/orgs/$ORG_OR_USER/packages/$PACKAGE_TYPE/$PACKAGE/versions"
     else
         VERSIONS_URL="https://api.github.com/user/packages/$PACKAGE_TYPE/$PACKAGE/versions"
     fi
-    
+
     RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: token $TOKEN" "$VERSIONS_URL")
     HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
     JSON_DATA=$(echo "$RESPONSE" | head -n -1)
-    
+
     if [ "$HTTP_CODE" -ne 200 ]; then
         echo "  Error: Failed to fetch versions for package $PACKAGE (HTTP $HTTP_CODE)"
         continue
     fi
-    
+
     VERSION_IDS=$(echo "$JSON_DATA" | jq -r ".[] | select(.name == \"$VERSION\") | .id" 2>/dev/null)
     if [ $? -ne 0 ]; then
         echo "  Error: Invalid JSON response for versions of package $PACKAGE"
         continue
     fi
-    
+
     if [ -z "$VERSION_IDS" ]; then
         echo "  No version $VERSION found for package $PACKAGE"
         continue
     fi
-    
+
     for VID in $VERSION_IDS; do
         echo "  Deleting version $VERSION (ID: $VID) of package $PACKAGE"
         if [ "$SCOPE" = "org" ]; then

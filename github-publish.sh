@@ -4,7 +4,7 @@ GPR_USER=$(grep gpr.user local.properties | cut -d'=' -f2)
 GPR_KEY=$(grep gpr.key local.properties | cut -d'=' -f2)
 echo "GPR_USER: $GPR_USER"
 echo "GPR_KEY: $GPR_KEY"
-export VERSION=1.1.0
+export VERSION=1.0.0-SNAPSHOT
 export GROUP=com.storyteller_f.endpoint4k
 
 ./gradlew publishAllPublicationsToGitHubPackagesRepository -Pgpr.user="$GPR_USER" -Pgpr.key="$GPR_KEY" -Pversion=$VERSION -Pgroup="${GROUP}"

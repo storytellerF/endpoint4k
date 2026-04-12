@@ -9,7 +9,7 @@ fun <Resp : Any> SafeEndpoint<Resp>.resp(resp: KClass<Resp>) = Unit
 inline fun <Resp : Any> safeEndpointBuilder(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET,
-    build: SafeEndpoint<Resp>.() -> Unit
+    build: SafeEndpoint<Resp>.() -> Unit = {}
 ): SafeEndpoint<Resp> {
     return SafeEndpoint<Resp>(
         path,
@@ -26,7 +26,7 @@ inline fun <Resp : Any, reified Query : Any> SafeEndpointWithQuery<Resp, Query>.
 inline fun <Resp : Any, reified Query : Any> safeEndpointWithQueryBuilder(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET,
-    build: SafeEndpointWithQuery<Resp, Query>.() -> Unit
+    build: SafeEndpointWithQuery<Resp, Query>.() -> Unit = {}
 ): SafeEndpointWithQuery<Resp, Query> {
     return SafeEndpointWithQuery<Resp, Query>(
         path,
@@ -45,7 +45,7 @@ inline fun <Resp : Any, reified PathQuery : Any> SafeEndpointWithPath<Resp, Path
 inline fun <Resp : Any, reified PathQuery : Any> safeEndpointWithPathBuilder(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET,
-    build: SafeEndpointWithPath<Resp, PathQuery>.() -> Unit
+    build: SafeEndpointWithPath<Resp, PathQuery>.() -> Unit = {}
 ): SafeEndpointWithPath<Resp, PathQuery> {
     return SafeEndpointWithPath<Resp, PathQuery>(
         path,
@@ -68,7 +68,7 @@ inline fun <Resp : Any, reified Query : Any, reified PathQuery : Any>
 inline fun <Resp : Any, reified Query : Any, reified PathQuery : Any> safeEndpointWithQueryAndPathBuilder(
     path: String,
     methodType: SafeMethodType = SafeMethodType.GET,
-    build: SafeEndpointWithQueryAndPath<Resp, Query, PathQuery>.() -> Unit
+    build: SafeEndpointWithQueryAndPath<Resp, Query, PathQuery>.() -> Unit = {}
 ): SafeEndpointWithQueryAndPath<Resp, Query, PathQuery> {
     return SafeEndpointWithQueryAndPath<Resp, Query, PathQuery>(
         path,
@@ -87,7 +87,7 @@ fun <Resp : Any, Body : Any> MutationEndpoint<Resp, Body>.body(body: KClass<Body
 inline fun <Resp : Any, Body : Any> mutationEndpointBuilder(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST,
-    build: MutationEndpoint<Resp, Body>.() -> Unit
+    build: MutationEndpoint<Resp, Body>.() -> Unit = {}
 ): MutationEndpoint<Resp, Body> {
     return MutationEndpoint<Resp, Body>(
         path,
@@ -109,7 +109,7 @@ inline fun <Resp : Any, Body : Any, reified Query : Any>
 inline fun <Resp : Any, Body : Any, reified Query : Any> mutationEndpointWithQueryBuilder(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST,
-    build: MutationEndpointWithQuery<Resp, Body, Query>.() -> Unit
+    build: MutationEndpointWithQuery<Resp, Body, Query>.() -> Unit = {}
 ): MutationEndpointWithQuery<Resp, Body, Query> {
     return MutationEndpointWithQuery<Resp, Body, Query>(
         path,
@@ -132,7 +132,7 @@ inline fun <Resp : Any, Body : Any, reified Path : Any>
 inline fun <Resp : Any, Body : Any, reified Path : Any> mutationEndpointWithPathBuilder(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST,
-    build: MutationEndpointWithPath<Resp, Body, Path>.() -> Unit
+    build: MutationEndpointWithPath<Resp, Body, Path>.() -> Unit = {}
 ): MutationEndpointWithPath<Resp, Body, Path> {
     return MutationEndpointWithPath<Resp, Body, Path>(
         path,
@@ -159,7 +159,7 @@ inline fun <Resp : Any, Body : Any, reified Query : Any, reified PathQuery : Any
 mutationEndpointWithQueryAndPathBuilder(
     path: String,
     methodType: MutationMethodType = MutationMethodType.POST,
-    build: MutationEndpointWithQueryAndPath<Resp, Body, Query, PathQuery>.() -> Unit
+    build: MutationEndpointWithQueryAndPath<Resp, Body, Query, PathQuery>.() -> Unit = {}
 ): MutationEndpointWithQueryAndPath<Resp, Body, Query, PathQuery> {
     return MutationEndpointWithQueryAndPath<Resp, Body, Query, PathQuery>(
         path,
