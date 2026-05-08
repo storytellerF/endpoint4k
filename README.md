@@ -1,7 +1,5 @@
 # endpoint4k
 
-[![](https://jitpack.io/v/storytellerF/endpoint4k.svg)](https://jitpack.io/#storytellerF/endpoint4k)
-
 `endpoint4k` is a type-safe routing library for [Ktor](https://ktor.io/). It allows you to share API definitions between your server and client, simplifying the development of web applications and reducing runtime errors caused by API mismatches.
 
 ## Features
