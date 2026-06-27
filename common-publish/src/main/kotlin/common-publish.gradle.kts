@@ -20,7 +20,6 @@ mavenPublishing {
             developer {
                 id.set("storytellerF")
                 name.set("storytellerF")
-                email.set("placeholder@example.com")
             }
         }
         scm {
