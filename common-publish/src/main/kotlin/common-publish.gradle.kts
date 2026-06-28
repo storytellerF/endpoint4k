@@ -1,31 +1,32 @@
 plugins {
-    `java-library`
-    `maven-publish`
+    id("com.vanniktech.maven.publish")
 }
 
-println("group: $group, version: $version")
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    coordinates(artifactId = "endpoint4k-${project.name}")
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/storytellerF/endpoint4k")
-            credentials {
-                username = project.findProperty("gpr.user") as String
-                password = project.findProperty("gpr.key") as String
+    pom {
+        name.set("endpoint4k")
+        description.set("Type-safe routing library for Ktor, Http4k, and OkHttp")
+        url.set("https://github.com/storytellerF/endpoint4k")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
             }
         }
-    }
-    publications {
-        // 如果不添加下面的代码，无法发布出来artifact
-        create<MavenPublication>("mavenJava") {
-            // 包含java kotlin，选择kotlin 也能发布成功，但是无法绑定source jar
-            from(components["java"])
+        developers {
+            developer {
+                id.set("storytellerF")
+                name.set("storytellerF")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/storytellerF/endpoint4k.git")
+            developerConnection.set("scm:git:ssh://github.com/storytellerF/endpoint4k.git")
+            url.set("https://github.com/storytellerF/endpoint4k")
         }
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }

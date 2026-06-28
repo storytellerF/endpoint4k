@@ -1,7 +1,5 @@
 # endpoint4k
 
-[![](https://jitpack.io/v/storytellerF/endpoint4k.svg)](https://jitpack.io/#storytellerF/endpoint4k)
-
 `endpoint4k` 是一个为 [Ktor](https://ktor.io/) 设计的类型安全路由库。它允许您在服务器和客户端之间共享 API 定义，从而简化 Web 应用程序的开发，减少因 API 不匹配而导致的运行时错误。
 
 ## 特性
@@ -13,30 +11,18 @@
 
 ## 安装
 
-首先，将 JitPack 仓库添加到您的根 `build.gradle.kts` 或 `settings.gradle.kts` 文件中：
+将以下依赖项添加到您的模块 `build.gradle.kts` 文件中：
 
 ```kotlin
-// settings.gradle.kts
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        maven { url = uri("https.jitpack.io") }
-    }
-}
-```
-
-然后，将以下依赖项添加到您的模块 `build.gradle.kts` 文件中：
-
-```kotlin
-val endpoint4kVersion = "1.0-SNAPSHOT"
+val endpoint4kVersion = "1.1.0"
 // common
-implementation("com.github.storytellerF.endpoint4k:common:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-common:$endpoint4kVersion")
 
 // ktor server
-implementation("com.github.storytellerF.endpoint4k:ktor-server:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-ktor-server:$endpoint4kVersion")
 
 // ktor client
-implementation("com.github.storytellerF.endpoint4k:ktor-client:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-ktor-client:$endpoint4kVersion")
 ```
 
 ## 使用示例
