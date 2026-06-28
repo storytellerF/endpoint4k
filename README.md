@@ -11,30 +11,18 @@
 
 ## Installation
 
-First, add the JitPack repository to your root `build.gradle.kts` or `settings.gradle.kts` file:
+Add the following dependencies to your module's `build.gradle.kts` file:
 
 ```kotlin
-// settings.gradle.kts
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        maven { url = uri("https.jitpack.io") }
-    }
-}
-```
-
-Then, add the following dependencies to your module's `build.gradle.kts` file:
-
-```kotlin
-val endpoint4kVersion = "1.0-SNAPSHOT"
+val endpoint4kVersion = "1.1.0"
 // common
-implementation("com.github.storytellerF.endpoint4k:common:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-common:$endpoint4kVersion")
 
 // ktor server
-implementation("com.github.storytellerF.endpoint4k:ktor-server:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-ktor-server:$endpoint4kVersion")
 
 // ktor client
-implementation("com.github.storytellerF.endpoint4k:ktor-client:$endpoint4kVersion")
+implementation("io.github.storytellerf:endpoint4k-ktor-client:$endpoint4kVersion")
 ```
 
 ## Usage Example

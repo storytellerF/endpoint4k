@@ -5,6 +5,7 @@ plugins {
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
+    coordinates(artifactId = "endpoint4k-${project.name}")
 
     pom {
         name.set("endpoint4k")

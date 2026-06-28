@@ -27,7 +27,7 @@ jobs:
       - run: chmod +x gradlew
 
       - name: Publish
-        run: ./gradlew publishAllPublicationsToMavenCentralRepository -Pversion="$VERSION" -Pgroup="com.storyteller_f.endpoint4k"
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository -Pversion="$VERSION" -Pgroup="io.github.storytellerf"
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PASSWORD }}
