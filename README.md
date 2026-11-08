@@ -1,17 +1,20 @@
+<a id="endpoint4k"></a>
 # endpoint4k
 
-`endpoint4k` is a type-safe routing library for [Ktor](https://ktor.io/). It allows you to share API definitions between your server and client, simplifying the development of web applications and reducing runtime errors caused by API mismatches.
+`endpoint4k` 是面向 [Ktor](https://ktor.io/) 的类型安全路由库。它让服务器与客户端共享 API 定义，简化 Web 应用开发，减少 API 不一致导致的运行时错误。
 
-## Features
+<a id="features"></a>
+## 功能
 
-- **Type-Safe**: Catch routing errors at compile time, not at runtime.
-- **Code Sharing**: Share API definitions between your Ktor server and client.
-- **Concise Syntax**: Utilizes Kotlin's features, like extension functions and the `invoke` operator, to provide a clean and expressive API.
-- **Comprehensive Support**: Supports path parameters, query parameters, request bodies, and common HTTP methods (GET, POST, PUT, PATCH, DELETE).
+- **类型安全**：在编译期发现路由错误。
+- **代码共享**：在 Ktor 服务器与客户端之间共享 API 定义。
+- **语法简洁**：利用 Kotlin 扩展函数和 `invoke` 运算符等特性，提供清楚且富有表达力的 API。
+- **支持全面**：支持路径参数、查询参数、请求体及常见 HTTP 方法（GET、POST、PUT、PATCH、DELETE）。
 
-## Installation
+<a id="installation"></a>
+## 安装
 
-Add the following dependencies to your module's `build.gradle.kts` file:
+将以下依赖添加到模块的 `build.gradle.kts`：
 
 ```kotlin
 val endpoint4kVersion = "1.1.0"
@@ -25,13 +28,15 @@ implementation("io.github.storytellerf:endpoint4k-ktor-server:$endpoint4kVersion
 implementation("io.github.storytellerf:endpoint4k-ktor-client:$endpoint4kVersion")
 ```
 
-## Usage Example
+<a id="usage-example"></a>
+## 使用示例
 
-Here is a complete example demonstrating how to define an API, implement it on the server, and call it from the client.
+以下完整示例展示如何定义 API、在服务器实现并从客户端调用。
 
-### 1. Define the Shared API
+<a id="1-define-the-shared-api"></a>
+### 1. 定义共享 API
 
-First, define your API endpoints in a shared module (e.g., `commonMain`). This includes data classes and the API routes themselves.
+首先在共享模块（例如 `commonMain`）中定义 API 端点，包括数据类和 API 路由本身。
 
 ```kotlin
 import com.storyteller_f.endpoint4k.common.*
@@ -60,9 +65,10 @@ object UserApi {
 }
 ```
 
-### 2. Server-Side Implementation
+<a id="2-server-side-implementation"></a>
+### 2. 服务器实现
 
-On your Ktor server, use the `invoke` operator to implement your defined API.
+在 Ktor 服务器中，使用 `invoke` 运算符实现定义好的 API。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -109,9 +115,10 @@ fun Application.configureRouting() {
 }
 ```
 
-### 3. Client-Side Call
+<a id="3-client-side-call"></a>
+### 3. 客户端调用
 
-In your Ktor client, also use the `invoke` operator to safely call the API.
+在 Ktor 客户端中，同样使用 `invoke` 运算符安全地调用 API。
 
 ```kotlin
 import io.ktor.client.*
@@ -140,4 +147,4 @@ suspend fun main() {
 }
 ```
 
-In this way, `endpoint4k` ensures that the API calls between the server and client are consistent and type-safe in terms of parameters, paths, and return types.
+这样，`endpoint4k` 能确保服务器与客户端在参数、路径和返回类型上的 API 调用一致且类型安全。
