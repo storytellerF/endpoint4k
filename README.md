@@ -1,9 +1,7 @@
-<a id="endpoint4k"></a>
 # endpoint4k
 
 `endpoint4k` 是面向 [Ktor](https://ktor.io/) 的类型安全路由库。它让服务器与客户端共享 API 定义，简化 Web 应用开发，减少 API 不一致导致的运行时错误。
 
-<a id="features"></a>
 ## 功能
 
 - **类型安全**：在编译期发现路由错误。
@@ -11,7 +9,6 @@
 - **语法简洁**：利用 Kotlin 扩展函数和 `invoke` 运算符等特性，提供清楚且富有表达力的 API。
 - **支持全面**：支持路径参数、查询参数、请求体及常见 HTTP 方法（GET、POST、PUT、PATCH、DELETE）。
 
-<a id="installation"></a>
 ## 安装
 
 将以下依赖添加到模块的 `build.gradle.kts`：
@@ -28,12 +25,10 @@ implementation("io.github.storytellerf:endpoint4k-ktor-server:$endpoint4kVersion
 implementation("io.github.storytellerf:endpoint4k-ktor-client:$endpoint4kVersion")
 ```
 
-<a id="usage-example"></a>
 ## 使用示例
 
 以下完整示例展示如何定义 API、在服务器实现并从客户端调用。
 
-<a id="1-define-the-shared-api"></a>
 ### 1. 定义共享 API
 
 首先在共享模块（例如 `commonMain`）中定义 API 端点，包括数据类和 API 路由本身。
@@ -65,7 +60,6 @@ object UserApi {
 }
 ```
 
-<a id="2-server-side-implementation"></a>
 ### 2. 服务器实现
 
 在 Ktor 服务器中，使用 `invoke` 运算符实现定义好的 API。
@@ -115,7 +109,6 @@ fun Application.configureRouting() {
 }
 ```
 
-<a id="3-client-side-call"></a>
 ### 3. 客户端调用
 
 在 Ktor 客户端中，同样使用 `invoke` 运算符安全地调用 API。

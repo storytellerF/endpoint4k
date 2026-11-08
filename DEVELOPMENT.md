@@ -1,9 +1,7 @@
-<a id="build-and-release-verification"></a>
 # 构建与发布验证
 
 使用 JDK 21 和仓库中的 Gradle Wrapper。Android target 还需要包含 platform 36 的 Android SDK。Windows 使用 `gradlew.bat` 代替 `./gradlew`。
 
-<a id="static-analysis-detekt"></a>
 ## 静态分析（Detekt）
 
 运行 `./gradlew detekt` 检查全部模块，或用 `./gradlew :ktor:ktor-client:detekt` 检查单个模块。普通 Detekt 检查只读源码（`autoCorrect = false`），发现违规时失败，包括可以自动修复的格式违规。可与编译和其他只读分析同时运行。CI 使用 `./gradlew check`，不修正源码。
@@ -20,7 +18,6 @@
 
 规则位于 `config/detekt/detekt.yml`。各模块的 XML、HTML、TXT、SARIF 和 Markdown 报告输出到 `build/reports/detekt/`；合并 SARIF 输出到 `build/reports/detekt/merge.sarif`。
 
-<a id="ci-gradle-cache"></a>
 ## CI Gradle 缓存
 
 Test 工作流针对 main 与 pull request 中的相关变更运行 `./gradlew check`，也可手动触发以验证缓存。Test 和 Publish 使用 `gradle/actions/setup-gradle@v6`、`cache-provider: enhanced` 和仓库中的 Wrapper；Java setup 只安装 JDK 21。只有 main 上的 Test 运行可写缓存，PR 与标签发布只读恢复。缓存预热不发布产物，也不需要发布凭据。
@@ -34,7 +31,6 @@ Test 工作流针对 main 与 pull request 中的相关变更运行 `./gradlew c
 
 运行链接和测量结果保留在 issue 中。本地工作流验证不能证明 GitHub 缓存复用、发布凭据可用或净运行时间收益。
 
-<a id="query-decoding-and-response-reading"></a>
 ## 查询解码与响应读取
 
 运行 `./gradlew :http4k:test :okhttp:test --warning-mode all`，验证 http4k 服务器查询解码器和 OkHttp 响应读取器。测试包含重复、缺失和无值的列表查询参数，JSON 与字符串响应，以及按 `String` 或 `Unit` 返回的空响应。
@@ -45,7 +41,6 @@ Test 工作流针对 main 与 pull request 中的相关变更运行 `./gradlew c
 ./gradlew :http4k:detekt :http4k:http4k-server:detekt :okhttp:detekt :okhttp:okhttp-client:detekt
 ```
 
-<a id="local-maven-verification"></a>
 ## 本地 Maven 验证
 
 以下命令将受影响的 JVM 产物、源码、文档、POM 和 Gradle 元数据构建并发布到隔离的本地仓库：
@@ -64,7 +59,6 @@ Test 工作流针对 main 与 pull request 中的相关变更运行 `./gradlew c
 
 将仓库路径替换为临时目录。本地检查排除签名任务，不验证签名、Central 上传或非 JVM target。标签触发的发布工作流仍保留签名和 Central 发布，并打印全部 Gradle 弃用警告。
 
-<a id="tracing-gradle-deprecations"></a>
 ## 追踪 Gradle 弃用项
 
 用 `./gradlew help --warning-mode all -Dorg.gradle.deprecation.trace=true` 查看配置期警告；再针对相关测试或发布任务运行同样选项，纳入执行期警告。检查每条堆栈中最先出现的插件或项目帧。

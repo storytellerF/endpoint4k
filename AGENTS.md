@@ -1,9 +1,7 @@
-<a id="project-guidelines-endpoint4k"></a>
 # 项目指引（endpoint4k）
 
 本文记录项目专属知识，帮助贡献者更快完成构建、测试和开发。
 
-<a id="modules-and-layout"></a>
 ## 模块与布局
 
 - 根项目为 Kotlin/JVM，包含以下子模块：
@@ -20,7 +18,6 @@
   - 生产代码：`src/main/kotlin`
   - 测试：`src/test/kotlin`；测试资源位于 `src/test/resources`，例如 `ktor/src/test/resources/logback.xml`。
 
-<a id="toolchain-and-build"></a>
 ## 工具链与构建
 
 - Kotlin：所有模块使用 2.1.21。需要 JSON 序列化功能的测试专用模块（`ktor` 和 `okhttp`）应用 2.2.0 版 `kotlinx-serialization` 插件。
@@ -36,7 +33,6 @@
   - http4k 客户端、服务器与测试使用 http4k 5.30.0.0。
   - 各模块统一使用 kotlinx-serialization-json 1.9.0。
 
-<a id="commands-windows-powershellcmd"></a>
 ### 命令（Windows PowerShell/CMD）
 
 - 构建全部模块：
@@ -64,7 +60,6 @@
 - Unix shell 中将 `gradlew.bat` 替换为 `./gradlew`。
 - 可直接在 IDE（IntelliJ IDEA）中运行测试，确保 Project SDK 为 JDK 21。
 
-<a id="testing-guidance"></a>
 ## 测试指引
 
 - Ktor 路径：
@@ -84,7 +79,6 @@
     - 通过 `http4k:client` 辅助方法调用客户端，不使用上下文接收者；辅助方法构造 http4k Request 并解码 Response。
     - http4k 辅助方法通过 kotlinx-serialization 编解码 JSON；修改型 API 的请求体自动编码为 `application/json`。
 
-<a id="adding-a-new-test"></a>
 ### 添加新测试
 
 1. 选择要验证行为的模块。
@@ -116,7 +110,6 @@
    - 通过 `http4k:server` 的服务器辅助方法（`invoke`、`receiveBody`）使用进程内 http4k 路由。
    - 使用 `http4k:client` 的客户端辅助方法（没有上下文接收者），可在构建器 lambda 中为 http4k Request 设置可选请求头。
 
-<a id="development-notes"></a>
 ## 开发说明
 
 - 上下文接收者：客户端与服务器 API 用它保持调用简洁。确保定义或调用辅助方法的模块（`ktor:client`、`okhttp:client` 及使用它们的测试模块）设置 `-Xcontext-parameters`。
@@ -131,19 +124,16 @@
   - Ktor：修改型 API 通过 `setBody(body)` 设置请求体，必要时指定 `ContentType.Application.Json`。
   - OkHttp：修改辅助方法自动将请求体序列化为 JSON 并设置 `application/json`；仍可通过提供的 `Request.Builder` lambda 添加请求头。
 
-<a id="verification-notes"></a>
 ## 验证说明
 
 本指引不声明实时测试结果。请使用“命令”部分在本地或 CI 运行相关模块或完整测试套件。
 
 Kotlin、Ktor、OkHttp、http4k 或序列化版本过时时，更新受影响 `build.gradle.kts` 中的版本，并重新运行 `./gradlew.bat build` 验证。
 
-<a id="static-analysis-detekt"></a>
 ## 静态分析（Detekt）
 
-遵循 [DEVELOPMENT.md 中的 Detekt 流程](DEVELOPMENT.md#static-analysis-detekt)。普通检查只读，可与编译同时运行。只有显式 `--auto-correct` 运行必须与同一源码的编译或分析分开；修正源码后重新运行检查。
+遵循 [DEVELOPMENT.md 中的 Detekt 流程](DEVELOPMENT.md#静态分析detekt)。普通检查只读，可与编译同时运行。只有显式 `--auto-correct` 运行必须与同一源码的编译或分析分开；修正源码后重新运行检查。
 
-<a id="implementation-placement-policy"></a>
 ## 实现代码放置规则
 
 - 所有生产实现必须放在专门负责客户端或服务器逻辑的子模块：
