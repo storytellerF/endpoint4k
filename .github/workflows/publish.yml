@@ -1,12 +1,15 @@
 name: Publish to Maven Central
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   publish:
+    if: startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -27,7 +30,7 @@ jobs:
 
       - name: Extract version from tag
         run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
+          VERSION="${RELEASE_TAG#v}"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - run: chmod +x gradlew
