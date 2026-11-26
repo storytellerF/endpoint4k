@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.21"
-agp = "9.5.1"
+agp = "9.5.3"
 ktor = "3.6.1"
 okhttp = "5.5.1"
 kotlinxSerializationJson = "1.13.0"
@@ -24,7 +24,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 
 http4k-core = { module = "org.http4k:http4k-core", version.ref = "http4k" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.6.7" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.6.8" }
 
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
 detekt-rules-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detektVersion" }
